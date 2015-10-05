@@ -78,7 +78,6 @@ cdef class schan(cda_sigbase_chan):
         readonly object val, prev_val
 
     def __cinit__(self, str name, object context=None, cxdtype_t dtype=CXDTYPE_DOUBLE):
-        #super(schan, self).__init__(name, context, dtype)
         pass
 
     cdef void cb(self):
@@ -104,7 +103,6 @@ cdef class vchan(cda_sigbase_chan):
         readonly object npdtype
 
     def __cinit__(self, str name, object context=None, cxdtype_t dtype=CXDTYPE_DOUBLE, int max_nelems=1):
-        #super(vchan, self).__init__(name, context, dtype, max_nelems)
         self.npdtype = cxdtype2np(dtype)
         self.val = np.zeros(max_nelems, self.npdtype, order='C')
 

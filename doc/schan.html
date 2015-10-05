@@ -1,0 +1,50 @@
+<html>
+<head>
+</head>
+<body>
+<h1>schan class</h1>
+Inheritance chain: cda_object -> cda_base_chan -> cda_sigbase_chan -> schan <br>
+<BR>
+This class is single value typed channel.<BR>
+Instances of this class registers required cda events to track time/value of
+selected control system channel. You can get information about channel trough it's properties.
+All the properties are readonly. It's an error if you try to assign properties
+If you need a notifications use instance signals.<br>
+<br>
+
+properties:<br>
+inherited:<br>
+int max_nelems - max number of elements = 1<br>
+cda_dataref_t ref - cda channel's id<br>
+cxdtype_t dtype - cx data type<br>
+str name - channel name (not full)<br>
+object context - context<br>
+int64 time - server-provided time of last value, us from UNIX epoch<br>
+int64 prev_time - server-provided time of previous value, us from UNIX epoch<br>
+size_t itemsize - value size, bytes<br>
+<br>
+self-defined:<br>
+object val - last-known value<br>
+object prev_val - preveous value<br>
+<br>
+Methods:<br>
+__cinit__(self, str name, object context=None, cxdtype_t dtype=CXDTYPE_DOUBLE)
+__str__(self)
+setValue(self, value) - request to set channel value, value is casted to type you select on instantiation<br>
+<BR>
+if val != prev_val then value changed.<br>
+<br>
+Signals:<br>
+valueMeasured(self) - emitted when new value arrived<br>
+valueChanged(self) - emitted when value changed<br>
+<br>
+Signals can be cda_signal or pyqtSignal depending on what you use pycda or cda.<br>
+sdchan don't inherit Qobject in qcda, encapsulation is used to bring pyqtSignals to
+channel-like classes. Instance that emitted a signal will be passed as only argument to
+connected functions.<br>
+Double in methods means that what ever you give will be casted to double.
+If it's not possible it's an error.
+
+
+</body>
+</html>

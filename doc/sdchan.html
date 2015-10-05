@@ -20,7 +20,7 @@ cxdtype_t dtype - cx data type<br>
 str name - channel name (not full)<br>
 object context - context<br>
 int64 time - server-provided time of last value, us from UNIX epoch<br>
-int64 prev_time - server-provided time of preveous value, us from UNIX epoch<br>
+int64 prev_time - server-provided time of previous value, us from UNIX epoch<br>
 size_t itemsize - value size, bytes<br>
 <br>
 self-defined:<br>
@@ -29,8 +29,10 @@ double prev_val - preveous value<br>
 double tolerance - channel tolerance<br>
 <br>
 Methods:<br>
-setValue(double value) - request to set channel value<br>
-setTolerance(double new_tolerance) - set channel change Tolerance,
+__cinit__(self, str name, object context=None)
+__str__(self)
+setValue(self, double value) - request to set channel value<br>
+setTolerance(self, double new_tolerance) - set channel change Tolerance,
 if abs(val - prev_val) > tolerance then value changed.<br>
 <br>
 Signals:<br>
