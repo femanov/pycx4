@@ -1,0 +1,179 @@
+<html>
+<head>
+</head>
+<body>
+<h1>python's cda for CXv4 Manual</h1>
+<h2>Licence</h2>
+The module developed and supported by Fedor Emanov in order to make easier work of researchers on CX-based
+control systems projects. So anyone can freely use this software on his own risk in any noncommercial project.<br>
+
+<h2>Introduction</h2>
+cda is channel acsess C library for CX control system software.
+This library is binded with Cython to provide python interface.
+It'is assumed that reader has basic knowledge in Linux, Python, and CXv4.
+<a href="cx4beginerguide.html">Read this to get started with CX</a>
+
+<br><br>
+<h3>Required environment:</h3>
+<ul>
+<li>modern version of cx4, compiled for you machine.
+<li>Python 2.6+/ 3.x (2.7 - will work, 2.6.x need some tests, 3.x - will work)
+<li>numpy 1.7+ (Vector channels use it. Tested with numpy 1.9)
+<li>Cython 0.15+ should work (tested with 0.17, 0.23)
+<li>Qt4 + PyQt4 for binding to PyQt apps (was tested and working
+  with Qt5 + PyQt5, but required to build Qcxscheduler with Qt5)
+</ul>
+
+<h2>1. Installation</h2>
+Module can be build with Python's distutils:<br>
+<ul>
+    <li>Edit setup.py: set correct value to 'cxdir' variable in the begining of file</li>
+    <li>use 'python setup.py build_ext -i' to build extensions</li>
+</ul>
+
+<h2>2. user's manual</h2>
+
+<h3>general notes</h3>
+There are console and Qt versions of extension, named pycda and qcda, wich provide almost
+the same API. There are few differences:
+<ul>
+    <li>Import the one you need.<br> <i>import pycda</i><br>or<br><i>import qcda</i></li><br>
+    <li>Run application main loop (event loop):<br>For PyQt app:<br><br>
+        <i>app = QtCore.QCoreApplication(sys.argv)<br>
+        (...your code here...)<br>
+        app.exec_()
+        </i><br>
+        <br>
+        for console app:<br><br>
+        <i>(...your code here...)<br>
+        pycda.py_sl_main_loop()</i>
+    </li><br>
+    <li>Signals are <i>pyqtSignal</i> for Qt-version, and <i>cda_cignal</i> for console version. <i>cda_cignal</i>
+        interface is like <i>pyqtSignal</i> one - connect, disconnect and emit with tha same usage way.
+        But two <i>cda_cignal</i> can't be connected and <i>cda_cignal</i> always emitted with one parameter
+        (which is python's object - used to pass reference to sender).
+        This similarity made in order to make console code compatible to Qt's one and avoid possible programmer
+        confusion.</li>
+</ul>
+<br>
+Current implementation of <i>cda_signal</i> quite low level and performance-optimised.
+it don't keep a python's references to connected functions, and check if the function
+is callable only when you connecting it. Destruction of connected function will crash you programm.<br>
+
+pycda few times faster than qcda depending on test conditions and hardware<br><br>
+
+<H3>Work logic, difference with C cda</H3>
+
+C cda provide a set of functions to operate with contecxts and channels.
+First you have to create context which stores default name prefix and has some servers-timing callbacks.
+Than you can populate context with channels - io units which give you interface to data
+(read/write, callback for events like data update).<br>
+This logic propagated to Python, but there are few differences:
+<ul>
+    <li>Context and channels are level higher then corresponding entities from C.
+        They automatize data acquisition which is manual at C cda level.</li>
+    <li>Context is'n required in python. If you create channel without context default context is used,
+        with default name prefix 'cx::' - using CXv4 protocol by default.</li>
+    <li>C cda don't makes a difference in channel kind, but pycda has three kinds of channels:
+        scalar channel, scalar double channel and vector channel. Channels have almost the same interface,
+        but internal work significantly different for each case.</li>
+    <li>cda formulas are not implemented yet.</li>
+</ul>
+<br>
+<h3>module reference</h3>
+<h4>pycda specific reference</h4>
+<b>py_sl_main_loop()</b> - run CX scheduler main loop. Use it to start main loop of pycda app.<BR>
+<b>py_sl_break()</b> - break CX scheduler main loop. CX sheduler do not know about python's sis.exit(), and will ignore it.
+Use this function instead<br>
+<a href="cda_signal.html">cda_signal</a> - multi-callback-handler class. it's interface looks like pyqtSignals,
+but there are some significant differences.
+For simple use there are <b>connect(python-callable)</b> and <b>disconnect(python-callable)</b> methods.
+
+<h4>pycda and qcda common classes and functions</h4>
+
+<a href="cda_context.html">cda_context</a> - cda context class<br>
+<a href="sdchan.html">sdchan(name, context=None)</a> - scalar double channel class<br>
+<a href="schan.html">schan(name, context=None, dtype=CXDTYPE_DOUBLE)</a> - general scalar channel class<br>
+<a href="vchan.html">vchan(name, context=None, dtype=CXDTYPE_DOUBLE, max_nelems=1)</a> - vector channel class<br>
+<br>
+Common for channels:<br>
+<b>val</b> - a channel last-known value (will return corresponding python's type or numpy array for vchan)<br>
+<b>time</b> - server provided update time, int64 in microseconds from unix epoch<br>
+<b>setValue(value)</b> - function to set a value (number for scalars or numpy array for vchan)<br>
+<b>valueMeasured, valueChanged</b> - signals to connect your callbacks<br>
+<br>
+CX dtype - is a specially coded int, is's better to use following constants:<br>
+PY_CXDTYPE_INT8<br>
+PY_CXDTYPE_INT16<br>
+PY_CXDTYPE_INT32<br>
+PY_CXDTYPE_INT64<br>
+PY_CXDTYPE_UINT8<br>
+PY_CXDTYPE_UINT16<br>
+PY_CXDTYPE_UINT32<br>
+PY_CXDTYPE_UINT64<br>
+PY_CXDTYPE_SINGLE<br>
+PY_CXDTYPE_DOUBLE<br>
+PY_CXDTYPE_TEXT<br>
+PY_CXDTYPE_UCTEXT<br>
+
+<br>
+there are also some cython-only classes (python-unusable):<br>
+<b>cda_object</b> - generalised cda object with callback data keeping.
+Base class for cda_context and cda_base_chan<br>
+<b>cda_base_chan</b> - base class for all channel classes.
+
+<h4>Examples</h4>
+simple pycda example:
+<hr>
+<pre>
+#!/usr/bin/env python
+import pycx.pycda as cda # Let's import pycda
+
+# this makes python interpreter exit on Ctrl-C
+import signal
+signal.signal(signal.SIGINT, signal.SIG_DFL)
+
+# defining a collback or slot does'n matter how to name it
+# function accepts on argument - a channel which sends this signal
+# really it's a pointer to channel
+def printval(chan):
+    print chan.val
+
+chan = cda.schan("localhost:1.name.0") # register a channel with given name
+chan.valueMeasured.connect(printval)   # connect our collback to channel's signal
+
+cda.py_sl_main_loop() # run main loop
+</pre>
+<hr>
+<br>
+The same example for Qt:<br>
+<hr>
+<pre>
+#!/usr/bin/env python
+import sys
+from PyQt4 import QtCore # import PyQt
+import pycx.qcda as cda # import qcda
+
+# this makes python interpreter exit on Ctrl-C
+import signal
+signal.signal(signal.SIGINT, signal.SIG_DFL)
+
+# defining a collback or slot does'n matter how to name it
+# function accepts on argument - a channel which sends this signal
+# really it's a pointer to channel
+def printval(chan):
+    print chan.val
+
+app = QtCore.QCoreApplication(sys.argv) # first you need Qt app
+
+chan = cda.schan("localhost:1.name.0") # register a channel with given name
+chan.valueMeasured.connect(printval)   # connect our collback to channel's signal
+
+sys.exit(app.exec_()) # run main loop
+</pre>
+<hr>
+<br>
+<br>
+
+</body>
+</html>
