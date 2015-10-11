@@ -32,5 +32,18 @@ extensions = [
 
               ]
 
+# Cython directives
+directives = {
+    'profile':   False,
+    'linetrace': False,
+    'c_string_type': 'bytes',
+    'c_string_encoding': 'ascii',
+    'boundscheck': False,
+    'wraparound': False,
+    'cdivision': True,
+    'always_allow_keywords': False,
+    'initializedcheck': False
+}
 
-setup(ext_modules=cythonize(extensions))
+setup(ext_modules=cythonize(extensions, compiler_directives=directives))
+

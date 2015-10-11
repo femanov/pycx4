@@ -13,7 +13,7 @@ i = 0
 def printval(chan):
     global i
     i += 1
-    if i == 10000000:
+    if i == 1000000:
         print(chan.val)
         t2 = time.time()
         print('time1 = %f ' % (t1-t0))

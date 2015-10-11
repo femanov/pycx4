@@ -1,7 +1,3 @@
-#cython: profile=False, linetrace=False
-#cython: c_string_type=bytes, c_string_encoding=ascii
-#cython: boundscheck=False, wraparound=False
-
 from PyQt4.QtCore import QObject, pyqtSignal
 
 # textual include of basic level cda classes

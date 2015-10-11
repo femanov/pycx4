@@ -1,18 +1,10 @@
-#cython: profile=False, linetrace=False
-#cython: c_string_type=bytes, c_string_encoding=ascii
-#cython: boundscheck=False, wraparound=False
-
 from cxscheduler cimport *
 
-#scheduler calls
 def py_sl_main_loop():
-    with nogil:
-        sl_main_loop()
+    sl_main_loop()
 
 def py_sl_break():
-    with nogil:
-        sl_break()
-
+    sl_break()
 
 include 'pycdabase.pxi'
 
@@ -23,9 +15,10 @@ cdef class cda_signal:
         void **callbacks
         int cnum
 
-    def __cinit__(self):
-        self.callbacks = NULL
-        self.cnum = 0
+# let's rely on default definitions, ha-ha. if any problems - will change it
+#    def __cinit__(self):
+#        self.callbacks = NULL
+#        self.cnum = 0
 
     def __dealloc__(self):
         free(self.callbacks)
@@ -67,9 +60,9 @@ cdef class cda_signal:
 
 # console client signaled base chan implementation
 cdef class cda_sigbase_chan(cda_base_chan):
-    cdef:
-        readonly cda_signal valueMeasured
-        readonly cda_signal valueChanged
+    cdef readonly:
+        cda_signal valueMeasured
+        cda_signal valueChanged
 
     def __cinit__(self, *args):
         self.valueMeasured = cda_signal()
