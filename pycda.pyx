@@ -52,10 +52,10 @@ cdef class cda_signal:
                     self.callbacks = <void**>tmp
                 self.cnum -= 1
 
-    cpdef emit(self, sender):
+    cpdef emit(self, object arg):
         cdef int ind
         for ind in range(self.cnum):
-            (<object>(self.callbacks[ind]))(sender)
+            (<object>(self.callbacks[ind]))(arg)
 
 
 # console client signaled base chan implementation
