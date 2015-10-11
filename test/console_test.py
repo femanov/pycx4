@@ -1,11 +1,7 @@
 #!/usr/bin/env python
 
-
-# imports for testing
 import time
-import sys
 import signal
-
 import pycx.pycda as cda
 
 signal.signal(signal.SIGINT, signal.SIG_DFL)

@@ -2,7 +2,6 @@
 #cython: c_string_type=bytes, c_string_encoding=ascii
 #cython: boundscheck=False, wraparound=False
 
-from cxenums import *
 from cxscheduler cimport *
 
 #scheduler calls

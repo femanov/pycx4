@@ -8,9 +8,6 @@ cxdir = '/home/femanov/control_system/4cx'
 cx4incdir = cxdir + '/src/include'
 
 extensions = [
-              Extension('cxenums', ['cxenums.pyx'],
-                        include_dirs=[cx4incdir],
-                        ),
               Extension('pycda', ['pycda.pyx'],
                         include_dirs=[numpy.get_include(),
                                       cx4incdir],
