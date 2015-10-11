@@ -7,7 +7,6 @@ from PyQt4.QtCore import QObject, pyqtSignal
 # textual include of basic level cda classes
 include 'pycdabase.pxi'
 
-
 # Signal container to bypass inheritance from QObject
 # to be encapsulated in Qt channel-like classes
 class Signaler(QObject):
