@@ -37,13 +37,13 @@ cdef inline int cda_check_exception(int code) except -1:
 # C callback for context
 cdef void evproc_cont_cycle(int uniq, void *privptr1, cda_context_t cid, int reason,
                       int info_int, void *privptr2) with gil:
-    #print "context_cycle"
-    pass
+    cdef cda_context cont=<cda_context>(<event*>privptr2)[0].objptr
+    cont.serverCycle.emit(cont)
 
 # C callback function for ref's (channels)
 cdef void evproc_rslvstat(int uniq, void *privptr1, cda_dataref_t ref, int reason,
                           void *info_ptr, void *privptr2) with gil:
-    chan = <cda_base_chan>(<event*>privptr2)[0].objptr
+    cdef cda_base_chan chan = <cda_base_chan>(<event*>privptr2)[0].objptr
     if <long>info_ptr == 0: # this is channel not found
         chan.notFound = -1
         print("Error: channel not found %s.%s" % (chan.base, chan.spec))
@@ -152,7 +152,7 @@ cdef class cda_context(cda_object):
             object signaler
             public object serverCycle
 
-    def __cinit__(self, defpfx="cx::", reg_events=True):
+    def __cinit__(self, defpfx="cx::"):
         cdef:
             int ret
             char *c_defpfx
@@ -162,11 +162,9 @@ cdef class cda_context(cda_object):
         ret = cda_new_context(0, NULL, c_defpfx, 0, NULL, 0, <cda_context_evproc_t>NULL, NULL)
         cda_check_exception(ret)
         self.cid, self.defpfx, self.chans, self.channum = ret, defpfx, NULL, 0
-        if reg_events:
-            self.add_event(CDA_CTX_EVMASK_CYCLE, <void*>evproc_cont_cycle, <void*>self, NULL)
 
         IF SIGNAL_IMPL=='cda_signal':
-            self.newCycle = cda_signal()
+            self.serverCycle = cda_signal()
         ELIF SIGNAL_IMPL=='pyqtSignal':
             self.signaler = ContSignaler()
             self.serverCycle = self.signaler.serverCycle
@@ -179,7 +177,11 @@ cdef class cda_context(cda_object):
         self.channum = 0
 
     def __str__(self):
-        return '<cda_context: cid=%d, defpfx=%s, numchans=>' % (self.cid, self.defpfx)
+        return '<cda_context: cid=%d, defpfx=%s, channum=%d>' % (self.cid, self.defpfx, self.channum)
+
+    def enable_serverCycle(self):
+        self.add_event(CDA_CTX_EVMASK_CYCLE, <void*>evproc_cont_cycle, <void*>self, NULL)
+
 
     cdef void save_chan(self, void *chan):
         cdef:
@@ -211,8 +213,6 @@ cdef class cda_context(cda_object):
 
 
 cdef cda_context default_context=cda_context()
-
-# classes for channels
 
 # wrapper-class for low-level functions and channel registration
 cdef class cda_base_chan(cda_object):

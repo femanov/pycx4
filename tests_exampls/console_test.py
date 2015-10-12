@@ -22,7 +22,7 @@ def printval(chan):
 
 t0 = time.time()
 
-context = cda.cda_context("localhost:1.NAME", False)
+context = cda.cda_context("localhost:1.NAME")
 
 chans = []
 
