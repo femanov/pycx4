@@ -2,6 +2,11 @@ from cda cimport *
 from libc.stdlib cimport realloc, free
 from libc.string cimport memmove
 
+IF SIGNAL_IMPL=='cda_signal':
+    include 'cda_signal.pxi'
+ELIF SIGNAL_IMPL=='pyqtSignal':
+    include 'qt_signalers.pxi'
+
 PY_CXDTYPE_UNKNOWN = CXDTYPE_UNKNOWN
 PY_CXDTYPE_INT8 = CXDTYPE_INT8
 PY_CXDTYPE_INT16 = CXDTYPE_INT16
@@ -15,7 +20,6 @@ PY_CXDTYPE_SINGLE = CXDTYPE_SINGLE
 PY_CXDTYPE_DOUBLE = CXDTYPE_DOUBLE
 PY_CXDTYPE_TEXT = CXDTYPE_TEXT
 PY_CXDTYPE_UCTEXT = CXDTYPE_UCTEXT
-
 
 # struct to extend private pointer
 ctypedef struct event:
@@ -31,8 +35,9 @@ cdef inline int cda_check_exception(int code) except -1:
     return 0
 
 # C callback for context
-cdef void evproc_cont(int uniq, void *privptr1, cda_context_t cid, int reason,
-                      int info_int, void *privptr2):
+cdef void evproc_cont_cycle(int uniq, void *privptr1, cda_context_t cid, int reason,
+                      int info_int, void *privptr2) with gil:
+    #print "context_cycle"
     pass
 
 # C callback function for ref's (channels)
@@ -139,8 +144,15 @@ cdef class cda_context(cda_object):
     cdef:
         void **chans
         int channum
+    IF SIGNAL_IMPL=='cda_signal':
+        cdef readonly:
+            cda_signal serverCycle
+    ELIF SIGNAL_IMPL=='pyqtSignal':
+        cdef:
+            object signaler
+            public object serverCycle
 
-    def __cinit__(self, defpfx="cx::"):
+    def __cinit__(self, defpfx="cx::", reg_events=True):
         cdef:
             int ret
             char *c_defpfx
@@ -150,6 +162,15 @@ cdef class cda_context(cda_object):
         ret = cda_new_context(0, NULL, c_defpfx, 0, NULL, 0, <cda_context_evproc_t>NULL, NULL)
         cda_check_exception(ret)
         self.cid, self.defpfx, self.chans, self.channum = ret, defpfx, NULL, 0
+        if reg_events:
+            self.add_event(CDA_CTX_EVMASK_CYCLE, <void*>evproc_cont_cycle, <void*>self, NULL)
+
+        IF SIGNAL_IMPL=='cda_signal':
+            self.newCycle = cda_signal()
+        ELIF SIGNAL_IMPL=='pyqtSignal':
+            self.signaler = ContSignaler()
+            self.serverCycle = self.signaler.serverCycle
+
 
     def __dealloc__(self):
         cda_check_exception( cda_del_context(self.cid) )
@@ -158,7 +179,7 @@ cdef class cda_context(cda_object):
         self.channum = 0
 
     def __str__(self):
-        return '<cda_context: cid=%d, defpfx=%s>' % (self.cid, self.defpfx)
+        return '<cda_context: cid=%d, defpfx=%s, numchans=>' % (self.cid, self.defpfx)
 
     cdef void save_chan(self, void *chan):
         cdef:
@@ -189,24 +210,34 @@ cdef class cda_context(cda_object):
         cda_check_exception( cda_del_context_evproc(self.cid, ev.evmask, <cda_context_evproc_t>ev.evproc, ev) )
 
 
-default_context = cda_context()
+cdef cda_context default_context=cda_context()
 
 # classes for channels
 
 # wrapper-class for low-level functions and channel registration
 cdef class cda_base_chan(cda_object):
     cdef readonly:
-        int max_nelems
         cda_dataref_t ref
-        cxdtype_t dtype
         str name
-        int64 time, prev_time
+        int max_nelems
+        cxdtype_t dtype
         size_t itemsize
+        int64 time, prev_time
 
     cdef:
         int notFound # 0 - unknown, 1 found, -1 not found
         int first_cycle
         void *context
+
+    IF SIGNAL_IMPL=='cda_signal':
+        cdef readonly:
+            cda_signal valueMeasured
+            cda_signal valueChanged
+    ELIF SIGNAL_IMPL=='pyqtSignal':
+        cdef:
+            object signaler
+            public object valueChanged
+            public object valueMeasured
 
     def __cinit__(self, str name, object context=None, cxdtype_t dtype=CXDTYPE_DOUBLE, int max_nelems=1):
         if not isinstance(context, cda_context):
@@ -230,9 +261,14 @@ cdef class cda_base_chan(cda_object):
         self.add_event(CDA_REF_EVMASK_RSLVSTAT, <void*>evproc_rslvstat, <void*>self, NULL)
         # registering data update callback
         self.add_event(CDA_REF_EVMASK_UPDATE, <void*>evproc_update, <void*>self, NULL)
-        # evproc_update just run self.base_cb, then self.cb
-        # base_cb - common work
-        # cb - type-special work
+
+        IF SIGNAL_IMPL=='cda_signal':
+            self.valueMeasured = cda_signal()
+            self.valueChanged = cda_signal()
+        ELIF SIGNAL_IMPL=='pyqtSignal':
+            self.signaler = ChanSignaler()
+            self.valueChanged = self.signaler.valueChanged
+            self.valueMeasured = self.signaler.valueMeasured
 
     def __dealloc__(self):
         cda_del_chan(self.ref)
@@ -257,7 +293,7 @@ cdef class cda_base_chan(cda_object):
     cdef void get_src(self, const char **src_p):
         cda_check_exception(cda_src_of_ref(self.ref, src_p))
 
-    # overriding cda_object method
+    # overriding cda_object methods
     cdef void register_event(self, event *ev):
         cda_check_exception( cda_add_dataref_evproc(self.ref, ev.evmask, <cda_dataref_evproc_t>ev.evproc, ev) )
 

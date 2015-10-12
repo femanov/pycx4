@@ -10,10 +10,12 @@ cdef extern from "cda.h" nogil:
     ctypedef CxDataRef_t cda_dataref_t
     ctypedef int cda_context_t
 
+    # context events
     enum:
         CDA_CTX_R_CYCLE
         CDA_CTX_EVMASK_CYCLE
 
+    # ref events
     enum:
        CDA_REF_R_UPDATE
        CDA_REF_EVMASK_UPDATE

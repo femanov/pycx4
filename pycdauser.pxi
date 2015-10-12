@@ -3,7 +3,7 @@ import numpy as np
 cimport numpy as np
 
 # scalar double channel
-cdef class sdchan(cda_sigbase_chan):
+cdef class sdchan(cda_base_chan):
     cdef:
         # all general properties defined in base classes
         readonly double val, prev_val, tolerance
@@ -73,7 +73,7 @@ cdef:
         return None
 
 # general channel (any cx type)
-cdef class schan(cda_sigbase_chan):
+cdef class schan(cda_base_chan):
     cdef:
         readonly object val, prev_val
 
@@ -97,7 +97,7 @@ cdef class schan(cda_sigbase_chan):
 
 
 # vector-data channel class
-cdef class vchan(cda_sigbase_chan):
+cdef class vchan(cda_base_chan):
     cdef:
         readonly np.ndarray val
         readonly object npdtype
