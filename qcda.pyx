@@ -23,7 +23,6 @@ cdef class cda_sigbase_chan(cda_base_chan):
         public object valueMeasured
 
     def __cinit__(self, *args):
-        #super(cda_sigbase_chan, self).__init__(*args)
         # encapsulating Signaler QObject
         self.signaler = Signaler()
         self.valueChanged = self.signaler.valueChanged
