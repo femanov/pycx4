@@ -45,5 +45,12 @@ directives = {
     'initializedcheck': False
 }
 
-setup(ext_modules=cythonize(extensions, compiler_directives=directives))
+setup(
+    version='0.1',
+    author='Fedor Emanov',
+    license='',
+    description='CX control system framework Python bindings',
+
+    ext_modules=cythonize(extensions, compiler_directives=directives)
+)
 
