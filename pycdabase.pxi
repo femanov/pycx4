@@ -169,10 +169,10 @@ cdef class cda_context(cda_object):
             self.signaler = ContSignaler()
             self.serverCycle = self.signaler.serverCycle
 
-
     def __dealloc__(self):
-        cda_check_exception( cda_del_context(self.cid) )
-        self.cid = 0
+        if self.cid > 0:
+            cda_check_exception( cda_del_context(self.cid) )
+            self.cid = 0
         free(self.chans)
         self.channum = 0
 
@@ -181,7 +181,6 @@ cdef class cda_context(cda_object):
 
     def enable_serverCycle(self):
         self.add_event(CDA_CTX_EVMASK_CYCLE, <void*>evproc_cont_cycle, <void*>self, NULL)
-
 
     cdef void save_chan(self, void *chan):
         cdef:
