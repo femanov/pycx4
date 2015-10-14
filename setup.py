@@ -1,9 +1,24 @@
 from setuptools import setup
-from distutils.extension import Extension
+from setuptools.extension import Extension
 from Cython.Build import cythonize
 import numpy
-from searchcx import cxpath
 import sys
+
+import os, os.path
+
+
+def cxpath():
+    path2cx = os.getenv('CXDIR')
+    if path2cx is not None:
+        return path2cx
+    subdirs = ['/work', '/cx', '/control_system']
+    home = os.getenv('HOME')
+    for x in subdirs:
+        path2cx = home + x
+        if os.path.exists(path2cx + '/4cx'):
+            return path2cx
+    return None
+
 
 cxdir = cxpath()
 if cxdir is None:
@@ -13,8 +28,15 @@ if cxdir is None:
 cx4lib = cxdir +'/4cx/src/lib'
 cx4include = cxdir + '/4cx/src/include'
 
+USE_CYTHON = False
+if os.path.isfile('pycda.pyx'):
+    USE_CYTHON = True
+    ext = '.pyx'
+else:
+    ext = '.c'
+
 extensions = [
-              Extension('pycda', ['pycda.pyx'],
+              Extension('pycda', ['pycda'+ext],
                         include_dirs=[numpy.get_include(),
                                       cx4include],
                         libraries=['cda', 'cx_async', 'useful', 'misc', 'cxscheduler'],
@@ -24,7 +46,7 @@ extensions = [
                                       cx4lib + '/misc',
                                       ],
                         ),
-              Extension('qcda', ['qcda.pyx'],
+              Extension('qcda', ['qcda'+ext],
                         include_dirs=[numpy.get_include(),
                                       cx4include],
                         libraries=['cda', 'cx_async', 'useful', 'misc', 'Qcxscheduler', 'QtCore'],
@@ -51,9 +73,14 @@ directives = {
     'initializedcheck': False
 }
 
+if USE_CYTHON:
+    from Cython.Build import cythonize
+    extensions = cythonize(extensions, compiler_directives=directives)
+
+
 setup(
     name='pycx4',
-    version='0.11',
+    version='0.16',
     url='https://github.com/femanov/pycx4/wiki',
     download_url='https://github.com/femanov/pycx4',
     author='Fedor Emanov',
@@ -62,9 +89,8 @@ setup(
     description='CXv4 control system framework Python bindings',
     long_description='CXv4 control system framework Python bindings, pycda and qcda modules',
     install_requires = [
-        "Cython >= 0.15",
         "numpy >= 1.7",
-        "PyQt4 >= 4.1",
+        "PyQtX",
         ],
     platforms='Linux',
     classifiers=[
@@ -88,6 +114,6 @@ setup(
         "Topic :: Software Development",
     ],
 
-    ext_modules=cythonize(extensions, compiler_directives=directives)
+    ext_modules = extensions
 )
 
