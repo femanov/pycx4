@@ -29,7 +29,7 @@ cx4include = cxdir + '/4cx/src/include'
 USE_CYTHON = False
 ext = '.c'
 for x in sys.argv:
-    if x == 'USE_CYTHON':
+    if x == 'use_cython':
         USE_CYTHON = True
         ext = '.pyx'
 
