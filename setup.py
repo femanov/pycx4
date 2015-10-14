@@ -1,4 +1,4 @@
-from distutils.core import setup
+from setuptools import setup
 from distutils.extension import Extension
 from Cython.Build import cythonize
 import numpy
@@ -7,7 +7,7 @@ import sys
 
 cxdir = cxpath()
 if cxdir is None:
-    print('unable to locate CX')
+    print('Error: Unable to locate CX')
     sys.exit(1)
 
 cx4lib = cxdir +'/4cx/src/lib'
@@ -52,16 +52,42 @@ directives = {
 }
 
 setup(
-    name='pycx',
-    version='0.1',
+    name='pycx4',
+    version='0.11',
+    url='https://github.com/femanov/pycx4/wiki',
+    download_url='https://github.com/femanov/pycx4',
     author='Fedor Emanov',
+    author_email='femanov@gmail.com',
     license='GPL',
-    description='CX control system framework Python bindings',
-    ext_modules=cythonize(extensions, compiler_directives=directives),
+    description='CXv4 control system framework Python bindings',
+    long_description='CXv4 control system framework Python bindings, pycda and qcda modules',
     install_requires = [
         "Cython >= 0.15",
         "numpy >= 1.7",
         "PyQt4 >= 4.1",
-]
+        ],
+    platforms='Linux',
+    classifiers=[
+        "Intended Audience :: Developers",
+        "License :: OSI Approved :: GNU General Public License (GPL)",
+        "Operating System :: POSIX",
+        "Operating System :: POSIX :: BSD",
+        "Operating System :: POSIX :: Linux",
+        "Programming Language :: Python",
+        "Programming Language :: Python :: 2",
+        "Programming Language :: Python :: 2.6",
+        "Programming Language :: Python :: 2.7",
+        "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.2",
+        "Programming Language :: Python :: 3.3",
+        "Programming Language :: Python :: 3.4",
+        "Programming Language :: Python :: 3.5",
+        "Programming Language :: Python :: Implementation :: CPython",
+        "Programming Language :: Cython",
+        "Topic :: Scientific/Engineering",
+        "Topic :: Software Development",
+    ],
+
+    ext_modules=cythonize(extensions, compiler_directives=directives)
 )
 

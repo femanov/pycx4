@@ -2,7 +2,7 @@
 
 import time
 import signal
-import pycx.pycda as cda
+import pycx4.pycda as cda
 
 signal.signal(signal.SIGINT, signal.SIG_DFL)
 

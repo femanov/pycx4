@@ -1,3 +1,0 @@
-cython>=0.15
-numpy>=1.7
-PyQt4>=4.5

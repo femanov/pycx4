@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import pycx.pycda as cda
+import pycx4.pycda as cda
 
 import signal
 signal.signal(signal.SIGINT, signal.SIG_DFL)
