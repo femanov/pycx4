@@ -2,31 +2,37 @@ from distutils.core import setup
 from distutils.extension import Extension
 from Cython.Build import cythonize
 import numpy
+from searchcx import cxpath
+import sys
 
-cxdir = '/home/femanov/control_system/4cx'
+cxdir = cxpath()
+if cxdir is None:
+    print('unable to locate CX')
+    sys.exit(1)
 
-cx4incdir = cxdir + '/src/include'
+cx4lib = cxdir +'/4cx/src/lib'
+cx4include = cxdir + '/4cx/src/include'
 
 extensions = [
               Extension('pycda', ['pycda.pyx'],
                         include_dirs=[numpy.get_include(),
-                                      cx4incdir],
+                                      cx4include],
                         libraries=['cda', 'cx_async', 'useful', 'misc', 'cxscheduler'],
-                        library_dirs=[cxdir + '/src/lib/cda',
-                                      cxdir + '/src/lib/cxlib',
-                                      cxdir + '/src/lib/useful',
-                                      cxdir + '/src/lib/misc',
+                        library_dirs=[cx4lib + '/cda',
+                                      cx4lib + '/cxlib',
+                                      cx4lib + '/useful',
+                                      cx4lib + '/misc',
                                       ],
                         ),
               Extension('qcda', ['qcda.pyx'],
                         include_dirs=[numpy.get_include(),
-                                      cx4incdir],
+                                      cx4include],
                         libraries=['cda', 'cx_async', 'useful', 'misc', 'Qcxscheduler', 'QtCore'],
-                        library_dirs=[cxdir + '/src/lib/cda',
-                                      cxdir + '/src/lib/cxlib',
-                                      cxdir + '/src/lib/Qcxscheduler',
-                                      cxdir + '/src/lib/useful',
-                                      cxdir + '/src/lib/misc',
+                        library_dirs=[cx4lib + '/cda',
+                                      cx4lib + '/cxlib',
+                                      cx4lib + '/Qcxscheduler',
+                                      cx4lib + '/useful',
+                                      cx4lib + '/misc',
                                       ],
                        )
 
@@ -46,11 +52,16 @@ directives = {
 }
 
 setup(
+    name='pycx',
     version='0.1',
     author='Fedor Emanov',
-    license='',
+    license='GPL',
     description='CX control system framework Python bindings',
-
-    ext_modules=cythonize(extensions, compiler_directives=directives)
+    ext_modules=cythonize(extensions, compiler_directives=directives),
+    install_requires = [
+        "Cython >= 0.15",
+        "numpy >= 1.7",
+        "PyQt4 >= 4.1",
+]
 )
 
