@@ -7,3 +7,4 @@ For documentation [see project's wiki](https://github.com/femanov/pycx/wiki)
 1. Build CXv4 in $HOME/work or $HOME/cx or $HOME/control_system or set $CXDIR=(path_to_your_CX) 
 2. Install module with: `pip install pycx4` (if you do not want to install it in system - use virtualenv)
 
+ 
