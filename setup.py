@@ -26,6 +26,7 @@ if cxdir is None:
 cx4lib = cxdir +'/4cx/src/lib'
 cx4include = cxdir + '/4cx/src/include'
 
+#bad but works
 USE_CYTHON = False
 ext = '.c'
 if os.path.isfile('./pycx4/pycda.pyx'):
