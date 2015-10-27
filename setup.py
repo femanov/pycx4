@@ -63,7 +63,7 @@ if USE_CYTHON:
 
 setup(
     name='pycx4',
-    version='0.193',
+    version='0.210',
     url='https://github.com/femanov/pycx4/wiki',
     download_url='https://github.com/femanov/pycx4',
     author='Fedor Emanov',
@@ -73,7 +73,6 @@ setup(
     long_description='CXv4 control system framework Python bindings, pycda and qcda modules',
     install_requires=[
         "numpy >= 1.7",
-        "PyQtX",
         ],
     packages=['pycx4'],
     package_data={'pycx4':['tests_exampls/*.*',

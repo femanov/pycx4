@@ -1,7 +1,7 @@
 #!/bin/sh
 
 
-CXDIR=$HOME/control_system
+CXDIR=$HOME/cx
 
 make -kC $CXDIR/cx/src clean maintainer-clean
 make -kC $CXDIR/cx/src/lib/Qcxscheduler TOPDIR=$CXDIR/cx/src clean maintainer-clean

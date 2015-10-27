@@ -2,7 +2,7 @@
 
 set -e
 
-CXDIR=$HOME/control_system
+CXDIR=$HOME/cx
 
 make -C $CXDIR/cx/src create-exports exports
 make -C $CXDIR/cx/src/lib/Qcxscheduler TOPDIR=$CXDIR/cx/src

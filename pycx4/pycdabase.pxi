@@ -37,16 +37,16 @@ cdef inline int cda_check_exception(int code) except -1:
 # C callback for context
 cdef void evproc_cont_cycle(int uniq, void *privptr1, cda_context_t cid, int reason,
                       int info_int, void *privptr2) with gil:
-    cdef cda_context cont=<cda_context>(<event*>privptr2)[0].objptr
+    cdef cda_context cont=<cda_context>(<event*>privptr2).objptr
     cont.serverCycle.emit(cont)
 
 # C callback function for ref's (channels)
 cdef void evproc_rslvstat(int uniq, void *privptr1, cda_dataref_t ref, int reason,
                           void *info_ptr, void *privptr2) with gil:
-    cdef cda_base_chan chan = <cda_base_chan>(<event*>privptr2)[0].objptr
+    #cdef cda_base_chan chan = (<event*>privptr2).objptr # segmentation fault - not yet get why
     if <long>info_ptr == 0: # this is channel not found
-        chan.notFound = -1
-        print("Error: channel not found %s.%s" % (chan.base, chan.spec))
+        #(.found=-1
+        pass
 
 cdef void evproc_update(int uniq, void *privptr1, cda_dataref_t ref, int reason,
                         void *info_ptr, void *privptr2) with gil:
@@ -197,10 +197,13 @@ cdef class cda_context(cda_object):
             int ind
         for ind in range(self.channum):
             if chan == self.chans[ind]:
-                memmove(&(self.chans[ind]), &(self.chans[self.channum-1]), sizeof(void*) )
-                tmp = realloc(<void*>self.chans, sizeof(void*) * (self.channum-1))
-                if not tmp and self.channum>1: raise MemoryError()
-                self.chans = <void**>tmp
+                if self.channum == 1:
+                    free(self.chans)
+                else:
+                    memmove(&(self.chans[ind]), &(self.chans[self.channum-1]), sizeof(void*) )
+                    tmp = realloc(<void*>self.chans, sizeof(void*) * (self.channum-1))
+                    if not tmp and self.channum>1: raise MemoryError()
+                    self.chans = <void**>tmp
                 self.channum -= 1
                 return
 
@@ -222,11 +225,12 @@ cdef class cda_base_chan(cda_object):
         cxdtype_t dtype
         size_t itemsize
         int64 time, prev_time
+        int found # -1 - not found, 0 - unknown, 1 found
 
     cdef:
-        int notFound # 0 - unknown, 1 found, -1 not found
         int first_cycle
         void *context
+        int registered
 
     IF SIGNAL_IMPL=='cda_signal':
         cdef readonly:
@@ -244,6 +248,14 @@ cdef class cda_base_chan(cda_object):
         else:
             self.context = <void*>context
 
+        IF SIGNAL_IMPL=='cda_signal':
+            self.valueMeasured = cda_signal()
+            self.valueChanged = cda_signal()
+        ELIF SIGNAL_IMPL=='pyqtSignal':
+            self.signaler = ChanSignaler()
+            self.valueChanged = self.signaler.valueChanged
+            self.valueMeasured = self.signaler.valueMeasured
+
         b_name = name.encode("ascii")
         cdef:
             char *c_name = b_name
@@ -256,22 +268,15 @@ cdef class cda_base_chan(cda_object):
             ret, name, dtype, max_nelems, True, sizeof_cxdtype(dtype)
 
         (<cda_context>self.context).save_chan(<void*>self)
-        # registering callback to check if channel found
-        self.add_event(CDA_REF_EVMASK_RSLVSTAT, <void*>evproc_rslvstat, <void*>self, NULL)
-        # registering data update callback
-        self.add_event(CDA_REF_EVMASK_UPDATE, <void*>evproc_update, <void*>self, NULL)
 
-        IF SIGNAL_IMPL=='cda_signal':
-            self.valueMeasured = cda_signal()
-            self.valueChanged = cda_signal()
-        ELIF SIGNAL_IMPL=='pyqtSignal':
-            self.signaler = ChanSignaler()
-            self.valueChanged = self.signaler.valueChanged
-            self.valueMeasured = self.signaler.valueMeasured
+        self.add_event(CDA_REF_EVMASK_RSLVSTAT, <void*>evproc_rslvstat, <void*>self, NULL)
+        self.add_event(CDA_REF_EVMASK_UPDATE,   <void*>evproc_update,   <void*>self, NULL)
+        self.registered = 1
 
     def __dealloc__(self):
         cda_del_chan(self.ref)
-        (<cda_context>self.context).drop_chan(<void*>self)
+        if self.registered:
+            (<cda_context>self.context).drop_chan(<void*>self)
 
     def __str__(self):
         return '<cda_channel: ref=%d, name=%s>' % (self.ref, self.name)

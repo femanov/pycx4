@@ -1,5 +1,6 @@
 #!/usr/bin/env sh
 
-rm ./*.c ./*.so ./*.pyc
+rm ./pycx4//*.c ./pycx4//*.so ./pycx4//*.pyc
 rm -r ./build
-rm -r __pycache__
+rm -r ./pycx4/__pycache__
+rm -r ./pycx4.egg-info

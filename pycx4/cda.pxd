@@ -121,6 +121,9 @@ cdef extern from "cda.h" nogil:
                                   char    **units_p,
                                   char    **dpyfmt_p)
 
+    int cda_status_of_ref_sid(cda_dataref_t ref)
+
+
     int cda_status_srvs_count(cda_context_t  cid)
     cda_serverstatus_t cda_status_of_srv(cda_context_t cid, int nth)
     const char *cda_status_srv_name(cda_context_t cid, int nth)
