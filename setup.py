@@ -75,9 +75,9 @@ setup(
         "numpy >= 1.7",
         ],
     packages=['pycx4'],
-    package_data={'pycx4':['tests_exampls/*.*',
-                           'tests_exampls/cx_build/*.*',
-                           'tests_exampls/test_servers/*.*']},
+#    package_data={'pycx4':['tests_exampls/*.*',
+#                           'tests_exampls/cx_build/*.*',
+#                           'tests_exampls/test_servers/*.*']},
     platforms='Linux',
     classifiers=[
         "Intended Audience :: Developers",

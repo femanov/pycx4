@@ -25,6 +25,16 @@ cdef class sdchan(cda_base_chan):
     cpdef setTolerance(self, double new_tolerance):
         self.tolerance = new_tolerance
 
+
+# 2DO: need to implement str channel
+cdef class strchan(cda_base_chan):
+    cdef:
+        readonly str val
+
+    cdef void cb(self):
+        pass
+
+
 # function for pythonize cx-any-val
 # not to effective, but not a bottleneck
 cdef:
@@ -57,6 +67,9 @@ cdef:
         if dtype == CXDTYPE_TEXT:   aval.c8 = value
         if dtype == CXDTYPE_UCTEXT: aval.c32 = value
 
+    # dtype conversion numpy <--> CX
+    # there are no text or unicode text.
+    # Cause text and unicode text can't be mixed with numbers in a good way
     object cxdtype2np(cxdtype_t dtype):
         if dtype == CXDTYPE_DOUBLE: return np.double
         if dtype == CXDTYPE_INT32:  return np.int32
@@ -68,9 +81,21 @@ cdef:
         if dtype == CXDTYPE_UINT32: return np.uint32
         if dtype == CXDTYPE_UINT64: return np.uint64
         if dtype == CXDTYPE_SINGLE: return np.single
-        if dtype == CXDTYPE_TEXT:   return np.ubite
-        if dtype == CXDTYPE_UCTEXT: return np.uint32
         return None
+
+    cxdtype_t np2cxdtype(object dtype):
+        if dtype == np.double:      return CXDTYPE_DOUBLE
+        if dtype == np.int32:       return CXDTYPE_INT32
+        if dtype == np.int8:        return CXDTYPE_INT8
+        if dtype == np.int16:       return CXDTYPE_INT16
+        if dtype == np.int64:       return CXDTYPE_INT64
+        if dtype == np.uint8:       return CXDTYPE_UINT8
+        if dtype == np.uint16:      return CXDTYPE_UINT16
+        if dtype == np.uint32:      return CXDTYPE_UINT32
+        if dtype == np.uint64:      return CXDTYPE_UINT64
+        if dtype == np.single:      return CXDTYPE_SINGLE
+        return 0
+
 
 # general channel (any cx type)
 cdef class schan(cda_base_chan):
@@ -109,9 +134,12 @@ cdef class vchan(cda_base_chan):
     cdef void cb(self):
         self.get_data(0, self.itemsize * self.max_nelems, <void*>self.val.data)
         self.valueMeasured.emit(self)
+        self.valueChanged.emit(self)
 
     cpdef setValue(self, np.ndarray value):
+        print "setting value"
         if value.size > self.max_nelems:
             raise Exception('value size greater than channel.max_nelems')
-        arr = value.astype(self.npdtype, order='C')
-        self.snd_data(self.dtype, arr.size, <void*>arr.data)
+        dtype = np2cxdtype(value.dtype)
+        self.snd_data(dtype, value.size, <void*>value.data)
+

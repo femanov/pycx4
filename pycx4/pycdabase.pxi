@@ -43,9 +43,9 @@ cdef void evproc_cont_cycle(int uniq, void *privptr1, cda_context_t cid, int rea
 # C callback function for ref's (channels)
 cdef void evproc_rslvstat(int uniq, void *privptr1, cda_dataref_t ref, int reason,
                           void *info_ptr, void *privptr2) with gil:
-    #cdef cda_base_chan chan = (<event*>privptr2).objptr # segmentation fault - not yet get why
+    cdef cda_base_chan chan = <cda_base_chan>(<event*>privptr2).objptr
     if <long>info_ptr == 0: # this is channel not found
-        #(.found=-1
+        chan.found=-1
         pass
 
 cdef void evproc_update(int uniq, void *privptr1, cda_dataref_t ref, int reason,
@@ -282,8 +282,8 @@ cdef class cda_base_chan(cda_object):
         return '<cda_channel: ref=%d, name=%s>' % (self.ref, self.name)
 
     cdef void cb(self):
+        print 'base chan cb called'
         #empty callback for overrideing
-        pass
 
     cdef void snd_data(self, cxdtype_t dtype, int nelems, void* data_p):
         cda_check_exception( cda_snd_ref_data(self.ref, dtype, nelems, data_p) )
