@@ -8,7 +8,8 @@ cdef class sdchan(cda_base_chan):
         # all general properties defined in base classes
         readonly double val, prev_val, tolerance
 
-    def __cinit__(self, str name, object context=None):
+    def __init__(self, str name, object context=None):
+        cda_base_chan.__init__(self, name, context)
         self.tolerance = 0.0
 
     cdef void cb(self):
@@ -26,13 +27,34 @@ cdef class sdchan(cda_base_chan):
         self.tolerance = new_tolerance
 
 
-# 2DO: need to implement str channel
 cdef class strchan(cda_base_chan):
     cdef:
-        readonly str val
+        readonly bytes val
+        char *cval
+        int allocated
+
+    def __init__(self, str name, object context=None, int max_nelems=1024):
+        cda_base_chan.__init__(self, name, context, CXDTYPE_TEXT, max_nelems)
+        self.cval = <char*>malloc(max_nelems)
+        if not self.cval: raise MemoryError()
+        self.allocated = 1
+
+    def __dealloc__(self):
+        if self.allocated:
+            free(self.cval)
 
     cdef void cb(self):
-        pass
+        length = cda_current_nelems_of_ref(self.ref)
+        self.get_data(0, self.max_nelems, <void*>self.cval)
+        self.val = <bytes>self.cval
+        self.valueMeasured.emit(self)
+        self.valueChanged.emit(self)
+
+    cpdef setValue(self, bytes value):
+        cdef char *v = value
+        self.snd_data(CXDTYPE_TEXT, len(value), <void*>v)
+
+
 
 
 # function for pythonize cx-any-val
@@ -102,8 +124,8 @@ cdef class schan(cda_base_chan):
     cdef:
         readonly object val, prev_val
 
-    def __cinit__(self, str name, object context=None, cxdtype_t dtype=CXDTYPE_DOUBLE):
-        pass
+    def __init__(self, str name, object context=None, cxdtype_t dtype=CXDTYPE_DOUBLE):
+        cda_base_chan.__init__(self, name, context, dtype)
 
     cdef void cb(self):
         cdef CxAnyVal_t aval
@@ -127,7 +149,8 @@ cdef class vchan(cda_base_chan):
         readonly np.ndarray val
         readonly object npdtype
 
-    def __cinit__(self, str name, object context=None, cxdtype_t dtype=CXDTYPE_DOUBLE, int max_nelems=1):
+    def __init__(self, str name, object context=None, cxdtype_t dtype=CXDTYPE_DOUBLE, int max_nelems=1):
+        cda_base_chan.__init__(self, name, context, dtype, max_nelems)
         self.npdtype = cxdtype2np(dtype)
         self.val = np.zeros(max_nelems, self.npdtype, order='C')
 
@@ -137,7 +160,6 @@ cdef class vchan(cda_base_chan):
         self.valueChanged.emit(self)
 
     cpdef setValue(self, np.ndarray value):
-        print "setting value"
         if value.size > self.max_nelems:
             raise Exception('value size greater than channel.max_nelems')
         dtype = np2cxdtype(value.dtype)

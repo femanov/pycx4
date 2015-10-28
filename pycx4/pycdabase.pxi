@@ -1,5 +1,5 @@
 from cda cimport *
-from libc.stdlib cimport realloc, free
+from libc.stdlib cimport realloc, free, malloc
 from libc.string cimport memmove
 
 IF SIGNAL_IMPL=='cda_signal':
@@ -79,7 +79,7 @@ cdef class cda_object:
         event *events
         int evnum
 
-    def __cinit__(self):
+    def __init__(self):
         self.events = NULL
         self.evnum = 0
 
@@ -152,7 +152,8 @@ cdef class cda_context(cda_object):
             object signaler
             public object serverCycle
 
-    def __cinit__(self, defpfx="cx::"):
+    def __init__(self, defpfx="cx::"):
+        cda_object.__init__(self)
         cdef:
             int ret
             char *c_defpfx
@@ -242,11 +243,10 @@ cdef class cda_base_chan(cda_object):
             public object valueChanged
             public object valueMeasured
 
-    def __cinit__(self, str name, object context=None, cxdtype_t dtype=CXDTYPE_DOUBLE, int max_nelems=1):
-        if not isinstance(context, cda_context):
-            self.context = <void*>default_context
-        else:
-            self.context = <void*>context
+    def __init__(self, str name, object context=None, cxdtype_t dtype=CXDTYPE_DOUBLE, int max_nelems=1):
+        cda_object.__init__(self)
+        if isinstance(context, cda_context): self.context = <void*>context
+        else: self.context = <void*>default_context
 
         IF SIGNAL_IMPL=='cda_signal':
             self.valueMeasured = cda_signal()
@@ -282,8 +282,8 @@ cdef class cda_base_chan(cda_object):
         return '<cda_channel: ref=%d, name=%s>' % (self.ref, self.name)
 
     cdef void cb(self):
-        print 'base chan cb called'
         #empty callback for overrideing
+        pass
 
     cdef void snd_data(self, cxdtype_t dtype, int nelems, void* data_p):
         cda_check_exception( cda_snd_ref_data(self.ref, dtype, nelems, data_p) )
