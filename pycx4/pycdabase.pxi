@@ -285,17 +285,21 @@ cdef class cda_base_chan(cda_object):
         #empty callback for overrideing
         pass
 
-    cdef void snd_data(self, cxdtype_t dtype, int nelems, void* data_p):
-        cda_check_exception( cda_snd_ref_data(self.ref, dtype, nelems, data_p) )
+    cdef int snd_data(self, cxdtype_t dtype, int nelems, void* data_p):
+        cdef int res = cda_snd_ref_data(self.ref, dtype, nelems, data_p)
+        cda_check_exception(res)
+        return res
 
-    cdef void get_data(self, size_t ofs, size_t size, void* buf):
-        cda_check_exception( cda_get_ref_data(self.ref, ofs, size, buf) )
+    cdef int get_data(self, size_t ofs, size_t size, void* buf):
+        cdef int res = cda_get_ref_data(self.ref, ofs, size, buf)
+        cda_check_exception(res)
+        return res
 
     cdef int current_nelems(self):
         return cda_current_nelems_of_ref(self.ref)
 
     cdef void get_src(self, const char **src_p):
-        cda_check_exception(cda_src_of_ref(self.ref, src_p))
+        cda_check_exception( cda_src_of_ref(self.ref, src_p) )
 
     # overriding cda_object methods
     cdef void register_event(self, event *ev):

@@ -44,9 +44,8 @@ cdef class strchan(cda_base_chan):
             free(self.cval)
 
     cdef void cb(self):
-        length = cda_current_nelems_of_ref(self.ref)
-        self.get_data(0, self.max_nelems, <void*>self.cval)
-        self.val = <bytes>self.cval
+        len = self.get_data(0, self.max_nelems, <void*>self.cval)
+        self.val = <bytes>self.cval[:len]
         self.valueMeasured.emit(self)
         self.valueChanged.emit(self)
 
