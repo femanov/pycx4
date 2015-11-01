@@ -63,7 +63,7 @@ if USE_CYTHON:
 
 setup(
     name='pycx4',
-    version='0.212',
+    version='0.213',
     url='https://github.com/femanov/pycx4/wiki',
     download_url='https://github.com/femanov/pycx4',
     author='Fedor Emanov',
