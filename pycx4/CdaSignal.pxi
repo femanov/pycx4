@@ -1,6 +1,6 @@
 # simple implementation of Qt-like multiply callback handler
 # for use with
-cdef class cda_signal:
+cdef class CdaSignal:
     cdef:
         void **callbacks
         int cnum
@@ -46,3 +46,4 @@ cdef class cda_signal:
         cdef int ind
         for ind in range(self.cnum):
             (<object>(self.callbacks[ind]))(arg)
+

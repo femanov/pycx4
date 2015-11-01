@@ -2,8 +2,8 @@ from cda cimport *
 from libc.stdlib cimport realloc, free, malloc
 from libc.string cimport memmove
 
-IF SIGNAL_IMPL=='cda_signal':
-    include 'cda_signal.pxi'
+IF SIGNAL_IMPL=='CdaSignal':
+    include 'CdaSignal.pxi'
 ELIF SIGNAL_IMPL=='pyqtSignal':
     include 'qt_signalers.pxi'
 
@@ -146,7 +146,7 @@ cdef class cda_context(cda_object):
         int channum
     IF SIGNAL_IMPL=='cda_signal':
         cdef readonly:
-            cda_signal serverCycle
+            CdaSignal serverCycle
     ELIF SIGNAL_IMPL=='pyqtSignal':
         cdef:
             object signaler
@@ -165,7 +165,7 @@ cdef class cda_context(cda_object):
         self.cid, self.defpfx, self.chans, self.channum = ret, defpfx, NULL, 0
 
         IF SIGNAL_IMPL=='cda_signal':
-            self.serverCycle = cda_signal()
+            self.serverCycle = CdaSignal()
         ELIF SIGNAL_IMPL=='pyqtSignal':
             self.signaler = ContSignaler()
             self.serverCycle = self.signaler.serverCycle
@@ -233,10 +233,10 @@ cdef class cda_base_chan(cda_object):
         void *context
         int registered
 
-    IF SIGNAL_IMPL=='cda_signal':
+    IF SIGNAL_IMPL=='CdaSignal':
         cdef readonly:
-            cda_signal valueMeasured
-            cda_signal valueChanged
+            CdaSignal valueMeasured
+            CdaSignal valueChanged
     ELIF SIGNAL_IMPL=='pyqtSignal':
         cdef:
             object signaler
@@ -248,9 +248,9 @@ cdef class cda_base_chan(cda_object):
         if isinstance(context, cda_context): self.context = <void*>context
         else: self.context = <void*>default_context
 
-        IF SIGNAL_IMPL=='cda_signal':
-            self.valueMeasured = cda_signal()
-            self.valueChanged = cda_signal()
+        IF SIGNAL_IMPL=='CdaSignal':
+            self.valueMeasured = CdaSignal()
+            self.valueChanged = CdaSignal()
         ELIF SIGNAL_IMPL=='pyqtSignal':
             self.signaler = ChanSignaler()
             self.valueChanged = self.signaler.valueChanged

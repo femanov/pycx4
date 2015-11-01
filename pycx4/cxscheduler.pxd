@@ -1,4 +1,13 @@
 
+from posix.types cimport time_t, suseconds_t
+
+# Dew to somehow incorrect timeval definition in posix.time
+# if timeval in posix.time - not a type
+ctypedef struct timeval:
+        time_t      tv_sec
+        suseconds_t tv_usec
+
+
 cdef extern from "cxscheduler.h" nogil:
     enum:
        SL_RD = 1 #,  // Watch when descriptor is ready for read
@@ -12,10 +21,9 @@ cdef extern from "cxscheduler.h" nogil:
     ctypedef void (*sl_tout_proc)(int uniq, void *privptr1, sl_tid_t tid, void *privptr2)
     ctypedef void (*sl_fd_proc)(int uniq, void *privptr1, sl_fdh_t fdh, int fd, int mask, void *privptr2)
 
-    # don't know how to define struct timeval *when
-    #cdef sl_tid_t sl_enq_tout_at(int uniq, void *privptr1,
-    #                         struct timeval *when,
-    #                         sl_tout_proc cb, void *privptr2)
+    cdef sl_tid_t sl_enq_tout_at(int uniq, void *privptr1,
+                                 timeval *when,
+                                 sl_tout_proc cb, void *privptr2)
 
     cdef sl_tid_t sl_enq_tout_after(int uniq, void *privptr1,
                                 int             usecs,
@@ -32,7 +40,6 @@ cdef extern from "cxscheduler.h" nogil:
 
     cdef int sl_main_loop()
     cdef int sl_break()
-
 
     #/* Note:
     #   the sl_set_select_behaviour() is implemented in
