@@ -60,7 +60,6 @@ cdef void evproc_update(int uniq, void *privptr1, cda_dataref_t ref, int reason,
     chan.time = <int64>timestr.sec * 1000000 + timestr.nsec / 1000
     chan.cb()
 
-
 # event handling functions
 cdef inline int event_feasible(event *ev):
     if ev.evmask == 0 or ev.evproc == NULL or ev.objptr == NULL:

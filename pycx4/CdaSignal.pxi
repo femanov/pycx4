@@ -1,16 +1,21 @@
 # simple implementation of Qt-like multiply callback handler
 # for use with
+from cpython cimport Py_INCREF,Py_DECREF
+
 cdef class CdaSignal:
     cdef:
         void **callbacks
         int cnum
 
 # let's rely on default definitions, ha-ha. if any problems - will change it
-#    def __cinit__(self):
-#        self.callbacks = NULL
-#        self.cnum = 0
+    def __cinit__(self):
+        self.callbacks = NULL
+        self.cnum = 0
 
     def __dealloc__(self):
+        cdef int ind
+        for ind in range(self.cnum):
+            Py_DECREF(<object>(self.callbacks[ind]))
         free(self.callbacks)
 
     cpdef connect(self, callback):
@@ -26,6 +31,7 @@ cdef class CdaSignal:
         self.callbacks = <void**>tmp
         self.callbacks[self.cnum] = <void*>callback
         self.cnum += 1
+        Py_INCREF(callback)
 
     cpdef disconnect(self, callback):
         cdef:
@@ -41,9 +47,9 @@ cdef class CdaSignal:
                     if not tmp: raise MemoryError()
                     self.callbacks = <void**>tmp
                 self.cnum -= 1
+        Py_DECREF(callback)
 
-    cpdef emit(self, object arg):
+    cpdef emit(self, object arg) with gil:
         cdef int ind
         for ind in range(self.cnum):
             (<object>(self.callbacks[ind]))(arg)
-
