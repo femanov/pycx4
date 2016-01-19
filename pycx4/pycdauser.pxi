@@ -54,8 +54,6 @@ cdef class strchan(cda_base_chan):
         self.snd_data(CXDTYPE_TEXT, len(value), <void*>v)
 
 
-
-
 # function for pythonize cx-any-val
 # not to effective, but not a bottleneck
 cdef:
