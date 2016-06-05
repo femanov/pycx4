@@ -1,6 +1,7 @@
 # user-level channel classes
 import numpy as np
 cimport numpy as np
+from cpython.version cimport *
 
 # scalar double channel
 cdef class sdchan(cda_base_chan):
@@ -29,7 +30,7 @@ cdef class sdchan(cda_base_chan):
 
 cdef class strchan(cda_base_chan):
     cdef:
-        readonly bytes val
+        readonly str val
         char *cval
         int allocated
 
@@ -45,13 +46,21 @@ cdef class strchan(cda_base_chan):
 
     cdef void cb(self):
         len = self.get_data(0, self.max_nelems, <void*>self.cval)
-        self.val = <bytes>self.cval[:len]
+        if PY_MAJOR_VERSION > 2:
+            self.val = (<bytes>self.cval[:len]).decode('UTF-8')
+        else:
+            self.val = self.cval[:len]
         self.valueMeasured.emit(self)
         self.valueChanged.emit(self)
 
-    cpdef setValue(self, bytes value):
-        cdef char *v = value
-        self.snd_data(CXDTYPE_TEXT, len(value), <void*>v)
+    cpdef setValue(self, str value):
+        if PY_MAJOR_VERSION > 2:
+            bv = value.encode('UTF-8')
+        else:
+            bv = unicode(value).encode('UTF-8')
+
+        cdef char *v = bv
+        self.snd_data(CXDTYPE_TEXT, len(bv), <void*>v)
 
 
 # function for pythonize cx-any-val
