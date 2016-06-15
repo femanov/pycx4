@@ -4,7 +4,7 @@ import numpy
 import sys
 import os, os.path
 from pycx4.aux import cxpath
-
+from pycx4.version import __version__
 
 cxdir = cxpath()
 if cxdir is None:
@@ -64,7 +64,7 @@ if USE_CYTHON:
 
 setup(
     name='pycx4',
-    version='0.218',
+    version=__version__,
     url='https://github.com/femanov/pycx4/wiki',
     download_url='https://github.com/femanov/pycx4',
     author='Fedor Emanov',
@@ -76,9 +76,6 @@ setup(
         "numpy >= 1.7",
         ],
     packages=['pycx4'],
-#    package_data={'pycx4':['tests_exampls/*.*',
-#                           'tests_exampls/cx_build/*.*',
-#                           'tests_exampls/test_servers/*.*']},
     platforms='Linux',
     classifiers=[
         "Intended Audience :: Developers",
