@@ -1,6 +1,9 @@
-# simple implementation of Qt-like multiply callback handler
+# simple cycthon implementation of signals
 # for use with
 from cpython cimport Py_INCREF,Py_DECREF
+from libc.stdlib cimport realloc, free, malloc
+from libc.string cimport memmove
+
 
 cdef class CdaSignal:
     cdef:

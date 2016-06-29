@@ -21,10 +21,10 @@ cdef class sdchan(cda_base_chan):
             self.first_cycle = False
         self.valueMeasured.emit(self)
 
-    cpdef setValue(self, double value):
+    cpdef void setValue(self, double value):
         cda_check_exception( cda_set_dcval(self.ref, value) )
 
-    cpdef setTolerance(self, double new_tolerance):
+    cpdef void setTolerance(self, double new_tolerance):
         self.tolerance = new_tolerance
 
 
@@ -53,7 +53,7 @@ cdef class strchan(cda_base_chan):
         self.valueMeasured.emit(self)
         self.valueChanged.emit(self)
 
-    cpdef setValue(self, str value):
+    cpdef void setValue(self, str value):
         if PY_MAJOR_VERSION > 2:
             bv = value.encode('UTF-8')
         else:
@@ -143,7 +143,7 @@ cdef class schan(cda_base_chan):
             self.first_cycle = False
         self.valueMeasured.emit(self)
 
-    cpdef setValue(self, value):
+    cpdef void setValue(self, value):
         cdef CxAnyVal_t aval
         aval_setvalue(value, &aval, self.dtype)
         self.snd_data(self.dtype, 1, <void*>&aval)
@@ -165,7 +165,7 @@ cdef class vchan(cda_base_chan):
         self.valueMeasured.emit(self)
         self.valueChanged.emit(self)
 
-    cpdef setValue(self, np.ndarray value):
+    cpdef void setValue(self, np.ndarray value):
         if value.size > self.max_nelems:
             raise Exception('value size greater than channel.max_nelems')
         dtype = np2cxdtype(value.dtype)

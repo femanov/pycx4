@@ -1,4 +1,4 @@
-from cda cimport *
+from cx4.cda cimport *
 from libc.stdlib cimport realloc, free, malloc
 from libc.string cimport memmove
 
@@ -43,11 +43,10 @@ cdef void evproc_cont_cycle(int uniq, void *privptr1, cda_context_t cid, int rea
 # C callback function for ref's (channels)
 cdef void evproc_rslvstat(int uniq, void *privptr1, cda_dataref_t ref, int reason,
                           void *info_ptr, void *privptr2) with gil:
-    print 'resolv_cb'
     cdef cda_base_chan chan = <cda_base_chan>(<event*>privptr2).objptr
-    if <long>info_ptr == 0: # this is channel not found
+    if <long>info_ptr == 0: # this is channel not found event
         chan.found=-1
-        pass
+        print('channel name not resolved by server: %s' % (chan.name,))
 
 cdef void evproc_update(int uniq, void *privptr1, cda_dataref_t ref, int reason,
                         void *info_ptr, void *privptr2) with gil:
@@ -269,7 +268,7 @@ cdef class cda_base_chan(cda_object):
 
         (<cda_context>self.context).save_chan(<void*>self)
 
-        #self.add_event(CDA_REF_EVMASK_RSLVSTAT, <void*>evproc_rslvstat, <void*>self, NULL)
+        self.add_event(CDA_REF_EVMASK_RSLVSTAT, <void*>evproc_rslvstat, <void*>self, NULL)
         self.add_event(CDA_REF_EVMASK_UPDATE,   <void*>evproc_update,   <void*>self, NULL)
         self.registered = 1
 

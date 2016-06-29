@@ -13,6 +13,7 @@ if cxdir is None:
 
 cx4lib = cxdir +'/4cx/src/lib'
 cx4include = cxdir + '/4cx/src/include'
+cx4pxd = '../cx4'
 
 #bad but works
 USE_CYTHON = False
@@ -22,7 +23,14 @@ if os.path.isfile('./pycx4/pycda.pyx'):
     ext = '.pyx'
 
 extensions = [
-    Extension('pycx4.pycda', ['./pycx4/pycda'+ext],
+    Extension('pycx4.scheduler', ['./pycx4/scheduler' + ext],
+              include_dirs=[cx4include, cx4pxd],
+              libraries=['useful', 'cxscheduler', 'misc'],
+              library_dirs=[cx4lib + '/useful',
+                            cx4lib + '/misc',
+                            ]
+              ),
+    Extension('pycx4.pycda', ['./pycx4/pycda' + ext],
               include_dirs=[numpy.get_include(), cx4include],
               libraries=['cda', 'cx_async', 'useful', 'misc', 'cxscheduler'],
               library_dirs=[cx4lib + '/cda',
@@ -31,7 +39,7 @@ extensions = [
                             cx4lib + '/misc',
                            ]
               ),
-    Extension('pycx4.qcda', ['./pycx4/qcda'+ext],
+    Extension('pycx4.qcda', ['./pycx4/qcda' + ext],
           include_dirs=[numpy.get_include(), cx4include],
           libraries=['cda', 'cx_async', 'useful', 'misc', 'Qcxscheduler', 'QtCore'],
           library_dirs=[cx4lib + '/cda',
@@ -72,9 +80,7 @@ setup(
     license='GPL',
     description='CXv4 control system framework Python bindings',
     long_description='CXv4 control system framework Python bindings, pycda and qcda modules',
-    install_requires=[
-        "numpy >= 1.7",
-        ],
+    install_requires=["numpy >= 1.7", ],
     packages=['pycx4'],
     platforms='Linux',
     classifiers=[
