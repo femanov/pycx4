@@ -2,7 +2,7 @@ from setuptools import setup
 from setuptools.extension import Extension
 import numpy
 import sys
-import os, os.path
+import os.path
 from pycx4.aux import cxpath
 from pycx4.version import __version__
 
@@ -11,11 +11,10 @@ if cxdir is None:
     print('Error: Unable to locate CX')
     sys.exit(1)
 
-cx4lib = cxdir +'/4cx/src/lib'
+cx4lib = cxdir + '/4cx/src/lib'
 cx4include = cxdir + '/4cx/src/include'
-cx4pxd = '../cx4'
 
-#bad but works
+
 USE_CYTHON = False
 ext = '.c'
 if os.path.isfile('./pycx4/pycda.pyx'):
@@ -23,13 +22,6 @@ if os.path.isfile('./pycx4/pycda.pyx'):
     ext = '.pyx'
 
 extensions = [
-    Extension('pycx4.scheduler', ['./pycx4/scheduler' + ext],
-              include_dirs=[cx4include, cx4pxd],
-              libraries=['useful', 'cxscheduler', 'misc'],
-              library_dirs=[cx4lib + '/useful',
-                            cx4lib + '/misc',
-                            ]
-              ),
     Extension('pycx4.pycda', ['./pycx4/pycda' + ext],
               include_dirs=[numpy.get_include(), cx4include],
               libraries=['cda', 'cx_async', 'useful', 'misc', 'cxscheduler'],

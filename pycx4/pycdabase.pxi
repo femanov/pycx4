@@ -2,11 +2,6 @@ from cx4.cda cimport *
 from libc.stdlib cimport realloc, free, malloc
 from libc.string cimport memmove
 
-IF SIGNAL_IMPL=='CdaSignal':
-    include 'CdaSignal.pxi'
-ELIF SIGNAL_IMPL=='pyqtSignal':
-    include 'qt_signalers.pxi'
-
 PY_CXDTYPE_UNKNOWN = CXDTYPE_UNKNOWN
 PY_CXDTYPE_INT8 = CXDTYPE_INT8
 PY_CXDTYPE_INT16 = CXDTYPE_INT16
@@ -143,10 +138,10 @@ cdef class cda_context(cda_object):
     cdef:
         void **chans
         int channum
-    IF SIGNAL_IMPL=='cda_signal':
+    IF SIGNAL_IMPL=='sl':
         cdef readonly:
-            CdaSignal serverCycle
-    ELIF SIGNAL_IMPL=='pyqtSignal':
+            Signal serverCycle
+    ELIF SIGNAL_IMPL=='Qt':
         cdef:
             object signaler
             public object serverCycle
@@ -163,9 +158,9 @@ cdef class cda_context(cda_object):
         cda_check_exception(ret)
         self.cid, self.defpfx, self.chans, self.channum = ret, defpfx, NULL, 0
 
-        IF SIGNAL_IMPL=='cda_signal':
-            self.serverCycle = CdaSignal()
-        ELIF SIGNAL_IMPL=='pyqtSignal':
+        IF SIGNAL_IMPL=='sl':
+            self.serverCycle = Signal()
+        ELIF SIGNAL_IMPL=='Qt':
             self.signaler = ContSignaler()
             self.serverCycle = self.signaler.serverCycle
 
@@ -232,11 +227,11 @@ cdef class cda_base_chan(cda_object):
         void *context
         int registered
 
-    IF SIGNAL_IMPL=='CdaSignal':
+    IF SIGNAL_IMPL=='sl':
         cdef readonly:
-            CdaSignal valueMeasured
-            CdaSignal valueChanged
-    ELIF SIGNAL_IMPL=='pyqtSignal':
+            Signal valueMeasured
+            Signal valueChanged
+    ELIF SIGNAL_IMPL=='Qt':
         cdef:
             object signaler
             public object valueChanged
@@ -247,10 +242,10 @@ cdef class cda_base_chan(cda_object):
         if isinstance(context, cda_context): self.context = <void*>context
         else: self.context = <void*>default_context
 
-        IF SIGNAL_IMPL=='CdaSignal':
-            self.valueMeasured = CdaSignal()
-            self.valueChanged = CdaSignal()
-        ELIF SIGNAL_IMPL=='pyqtSignal':
+        IF SIGNAL_IMPL=='sl':
+            self.valueMeasured = Signal()
+            self.valueChanged = Signal()
+        ELIF SIGNAL_IMPL=='Qt':
             self.signaler = ChanSignaler()
             self.valueChanged = self.signaler.valueChanged
             self.valueMeasured = self.signaler.valueMeasured

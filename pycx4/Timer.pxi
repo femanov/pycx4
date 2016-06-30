@@ -15,13 +15,13 @@ cdef class Timer:
         int usecs
         int repeat
         int running
-        CdaSignal shot
+        Signal shot
         sl_tid_t tid
 
     def __init__(self, int usecs, int repeat=0):
         self.usecs, self.repeat, self.running = usecs, repeat, 1
         tid = sl_enq_tout_after(0, NULL, usecs, sltimer_proc, <void*>self)
-        self.shot = CdaSignal()
+        self.shot = Signal()
 
     cpdef stop(self):
         if self.running:

@@ -1,11 +1,10 @@
 # simple cycthon implementation of signals
-# for use with
 from cpython cimport Py_INCREF,Py_DECREF
 from libc.stdlib cimport realloc, free, malloc
 from libc.string cimport memmove
 
 
-cdef class CdaSignal:
+cdef class Signal:
     cdef:
         void **callbacks
         int cnum
