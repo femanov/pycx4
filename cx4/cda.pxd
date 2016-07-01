@@ -3,7 +3,7 @@
 
 from misc_types cimport *
 from cx_common_types cimport *
-from cx cimport *
+from cx cimport cxdtype_t, cx_time_t, rflags_t
 
 
 cdef extern from "cda.h" nogil:

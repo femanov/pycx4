@@ -3,6 +3,7 @@
 class ChanSignaler(QObject):
     valueChanged = pyqtSignal(object)
     valueMeasured = pyqtSignal(object)
+    unresolved = pyqtSignal(object)
 
     def __init__(self):
         super(ChanSignaler, self).__init__()
