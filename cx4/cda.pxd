@@ -28,6 +28,7 @@ cdef extern from "cda.h" nogil:
         CDA_DATAREF_OPT_PRIVATE
         CDA_DATAREF_OPT_NO_RD_CONV
         CDA_DATAREF_OPT_SHY
+        CDA_DATAREF_OPT_FIND_ONLY
 
     enum:
         CDA_OPT_NONE
@@ -46,6 +47,10 @@ cdef extern from "cda.h" nogil:
     enum:
         CDA_CTX_R_CYCLE
         CDA_CTX_EVMASK_CYCLE
+        CDA_CTX_R_SRVSTAT
+        CDA_CTX_EVMASK_SRVSTAT
+        CDA_CTX_R_NEWSRV
+        CDA_CTX_EVMASK_NEWSRV
 
     # ref events
     enum:
@@ -57,14 +62,16 @@ cdef extern from "cda.h" nogil:
        CDA_REF_EVMASK_STRSCHG
        CDA_REF_R_RDSCHG
        CDA_REF_EVMASK_RDSCHG
+       CDA_REF_R_FRESHCHG
+       CDA_REF_EVMASK_FRESHCHG
        CDA_REF_R_LOCKSTAT
        CDA_REF_EVMASK_LOCKSTAT
        CDA_REF_R_RSLVSTAT
        CDA_REF_EVMASK_RSLVSTAT
 
     enum:
-        CDA_LOCK_RLS #= 0,
-        CDA_LOCK_SET #= 1,
+        CDA_LOCK_RLS
+        CDA_LOCK_SET
 
     ctypedef enum cda_serverstatus_t:
         #/* Note: the statuses are ordered by decreasing of severity,
@@ -158,6 +165,7 @@ cdef extern from "cda.h" nogil:
     int cda_nelems_of_ref        (cda_dataref_t ref)
     int cda_current_nelems_of_ref(cda_dataref_t ref)
     int cda_fresh_age_of_ref     (cda_dataref_t ref, cx_time_t *fresh_age_p)
+    int cda_current_dtype_of_ref (cda_dataref_t ref)
 
     int cda_strings_of_ref       (cda_dataref_t  ref,
                                   char    **ident_p,
@@ -168,13 +176,20 @@ cdef extern from "cda.h" nogil:
                                   char    **rsrvd6_p,
                                   char    **units_p,
                                   char    **dpyfmt_p)
+    int cda_phys_rds_of_ref      (cda_dataref_t  ref,
+                                  int     *phys_count_p,
+                                  double  **rds_p)
+
 
     int cda_status_of_ref_sid(cda_dataref_t ref)
 
     int cda_status_srvs_count(cda_context_t  cid)
     cda_serverstatus_t cda_status_of_srv(cda_context_t cid, int nth)
+    const char *cda_status_srv_scheme(cda_context_t  cid, int nth)
     const char *cda_status_srv_name(cda_context_t cid, int nth)
 
+    int cda_add_server_conn  (cda_context_t  cid,
+                              const char     *srvref)
 
     #/**********************/
     int cda_process_ref(cda_dataref_t ref, int options,

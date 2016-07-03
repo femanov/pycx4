@@ -1,6 +1,4 @@
 from cx4.cda cimport *
-from libc.stdlib cimport realloc, free, malloc
-from libc.string cimport memmove
 
 from cx4.cx cimport sizeof_cxdtype, cxdtype_t, cx_time_t, rflags_t
 
@@ -14,7 +12,7 @@ cdef inline int cda_check_exception(int code) except -1:
 # C callback function for ref's (channels)
 cdef void evproc_rslvstat(int uniq, void *privptr1, cda_dataref_t ref, int reason,
                           void *info_ptr, void *privptr2) with gil:
-    cdef cda_base_chan chan = <cda_base_chan>(<event*>privptr2).objptr
+    cdef BaseChan chan = <BaseChan>(<event*>privptr2).objptr
     if <long>info_ptr == 0: # this is channel not found event
         chan.found=-1
         print('channel name not resolved by server: %s' % (chan.name,))
@@ -24,23 +22,15 @@ cdef void evproc_update(int uniq, void *privptr1, cda_dataref_t ref, int reason,
     cdef:
         cx_time_t timestr
         rflags_t rflags
-        cda_base_chan chan = <cda_base_chan>(<event*>privptr2).objptr
+        BaseChan chan = <BaseChan>(<event*>privptr2).objptr
     cda_check_exception( cda_get_ref_stat(chan.ref, &rflags, &timestr) )
     chan.prev_time = chan.time
     chan.time = <int64>timestr.sec * 1000000 + timestr.nsec / 1000
     chan.cb()
 
 
-# classes
-
-
-
-
-
-
-
 # wrapper-class for low-level functions and channel registration
-cdef class cda_base_chan(CdaObject):
+cdef class BaseChan(CdaObject):
     cdef readonly:
         cda_dataref_t ref
         str name

@@ -4,13 +4,13 @@ cimport numpy as np
 from cpython.version cimport *
 
 # scalar double channel
-cdef class sdchan(cda_base_chan):
+cdef class sdchan(BaseChan):
     cdef:
         # all general properties defined in base classes
         readonly double val, prev_val, tolerance
 
     def __init__(self, str name, object context=None):
-        cda_base_chan.__init__(self, name, context)
+        BaseChan.__init__(self, name, context)
         self.tolerance = 0.0
 
     cdef void cb(self):
@@ -28,14 +28,14 @@ cdef class sdchan(cda_base_chan):
         self.tolerance = new_tolerance
 
 
-cdef class strchan(cda_base_chan):
+cdef class strchan(BaseChan):
     cdef:
         readonly str val
         char *cval
         int allocated
 
     def __init__(self, str name, object context=None, int max_nelems=1024):
-        cda_base_chan.__init__(self, name, context, CXDTYPE_TEXT, max_nelems)
+        BaseChan.__init__(self, name, context, CXDTYPE_TEXT, max_nelems)
         self.cval = <char*>malloc(max_nelems)
         if not self.cval: raise MemoryError()
         self.allocated = 1
@@ -126,12 +126,12 @@ cdef:
 
 
 # general channel (any cx type)
-cdef class schan(cda_base_chan):
+cdef class schan(BaseChan):
     cdef:
         readonly object val, prev_val
 
     def __init__(self, str name, object context=None, cxdtype_t dtype=CXDTYPE_DOUBLE):
-        cda_base_chan.__init__(self, name, context, dtype)
+        BaseChan.__init__(self, name, context, dtype)
 
     cdef void cb(self):
         cdef CxAnyVal_t aval
@@ -150,13 +150,13 @@ cdef class schan(cda_base_chan):
 
 
 # vector-data channel class
-cdef class vchan(cda_base_chan):
+cdef class vchan(BaseChan):
     cdef:
         readonly np.ndarray val
         readonly object npdtype
 
     def __init__(self, str name, object context=None, cxdtype_t dtype=CXDTYPE_DOUBLE, int max_nelems=1):
-        cda_base_chan.__init__(self, name, context, dtype, max_nelems)
+        BaseChan.__init__(self, name, context, dtype, max_nelems)
         self.npdtype = cxdtype2np(dtype)
         self.val = np.zeros(max_nelems, self.npdtype, order='C')
 

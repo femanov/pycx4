@@ -4,6 +4,8 @@ from libc.stdlib cimport realloc, free, malloc
 from libc.string cimport memmove
 
 include 'qt_signalers.pxi'
+include 'Signal.pxi'
+include 'Timer.pxi'
 
 # conpile-time define for contitional compilation
 DEF SIGNAL_IMPL='Qt'
@@ -18,6 +20,6 @@ include 'context.pxi'
 
 cdef Context default_context=Context()
 
-include 'pycdabase.pxi'
+include 'basechan.pxi'
 # textual include of user level classes
 include 'pycdauser.pxi'

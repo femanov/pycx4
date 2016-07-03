@@ -10,10 +10,10 @@ ctypedef struct timeval:
 
 cdef extern from "cxscheduler.h" nogil:
     enum:
-       SL_RD = 1 #,  // Watch when descriptor is ready for read
-       SL_WR = 2 #,  // Watch when descriptor is ready for write
-       SL_EX = 4 #,  // Watch descriptor for exceptions (in fact -- OOB data)
-       SL_CE = 8 #,  // Watch for Connect Errors.  That's a hint for Xh_cxscheduler exclusively
+       SL_RD  #,  // Watch when descriptor is ready for read
+       SL_WR  #,  // Watch when descriptor is ready for write
+       SL_EX  #,  // Watch descriptor for exceptions (in fact -- OOB data)
+       SL_CE  #,  // Watch for Connect Errors.  That's a hint for Xh_cxscheduler exclusively
 
     ctypedef int sl_tid_t
     ctypedef int sl_fdh_t

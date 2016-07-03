@@ -102,3 +102,13 @@ cdef extern from "cx.h" nogil:
         CXCF_FLAG_COLOR_YELLOW
 
         CXCF_FLAG_4WRONLY_MASK
+
+    enum:
+        CX_VALUE_LIT_MASK
+        CX_VALUE_DISABLED_MASK
+        CX_VALUE_COMMAND
+
+    enum:
+        CX_LOCK_RD
+        CX_LOCK_WR
+        CX_LOCK_ALLORNOTHING
