@@ -21,7 +21,7 @@ cdef class Context(CdaObject):
             Signal serverCycle
     ELIF SIGNAL_IMPL=='Qt':
         cdef:
-            object signaler
+            object c_serverCycle
             public object serverCycle
 
     def __init__(self, defpfx="cx::"):
@@ -39,8 +39,8 @@ cdef class Context(CdaObject):
         IF SIGNAL_IMPL=='sl':
             self.serverCycle = Signal()
         ELIF SIGNAL_IMPL=='Qt':
-            self.signaler = ContSignaler()
-            self.serverCycle = self.signaler.serverCycle
+            self.c_serverCycle = SignalContainer()
+            self.serverCycle = self.c_serverCycle.signal
 
     def __dealloc__(self):
         if self.cid > 0:

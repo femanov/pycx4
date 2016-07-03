@@ -3,9 +3,7 @@ from cx4.cda cimport *
 from libc.stdlib cimport realloc, free, malloc
 from libc.string cimport memmove
 
-include 'qt_signalers.pxi'
-include 'Signal.pxi'
-include 'Timer.pxi'
+include 'qt_signalcontainer.pxi'
 
 # conpile-time define for contitional compilation
 DEF SIGNAL_IMPL='Qt'

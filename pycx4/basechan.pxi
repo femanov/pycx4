@@ -51,9 +51,8 @@ cdef class BaseChan(CdaObject):
             Signal valueChanged
     ELIF SIGNAL_IMPL=='Qt':
         cdef:
-            object signaler
-            public object valueChanged
-            public object valueMeasured
+            object c_valueChanged, c_valueMeasured, c_unresolved
+            public object valueChanged, valueMeasured, unresolved
 
     def __init__(self, str name, object context=None, cxdtype_t dtype=CXDTYPE_DOUBLE, int max_nelems=1):
         CdaObject.__init__(self)
@@ -61,12 +60,10 @@ cdef class BaseChan(CdaObject):
         else: self.context = <void*>default_context
 
         IF SIGNAL_IMPL=='sl':
-            self.valueMeasured = Signal()
-            self.valueChanged = Signal()
+            self.valueMeasured, self.valueMeasured, self.unresolved = Signal(), Signal(), Signal()
         ELIF SIGNAL_IMPL=='Qt':
-            self.signaler = ChanSignaler()
-            self.valueChanged = self.signaler.valueChanged
-            self.valueMeasured = self.signaler.valueMeasured
+            self.c_valueChanged, self.c_valueMeasured, self.c_unresolved = SignalContainer(), SignalContainer(), SignalContainer()
+            self.valueChanged, self.valueMeasured, self.unresolved = self.c_valueChanged.signal, self.c_valueMeasured.signal, self.c_unresolved.signal
 
         b_name = name.encode("ascii")
         cdef:
