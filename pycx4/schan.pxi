@@ -1,5 +1,5 @@
 # general channel (any cx type)
-cdef class schan(BaseChan):
+cdef class chan(BaseChan):
     cdef:
         readonly object val, prev_val
 

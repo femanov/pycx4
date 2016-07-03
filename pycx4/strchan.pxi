@@ -1,5 +1,5 @@
 # chan to transfer python string
-cdef class strchan(BaseChan):
+cdef class Strchan(BaseChan):
     cdef:
         readonly str val
         char *cval
