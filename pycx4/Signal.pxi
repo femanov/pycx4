@@ -1,8 +1,5 @@
 # simple cycthon implementation of signals
 from cpython cimport Py_INCREF,Py_DECREF
-from libc.stdlib cimport realloc, free, malloc
-from libc.string cimport memmove
-
 
 cdef class Signal:
     cdef:

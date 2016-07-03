@@ -1,4 +1,3 @@
-
 from cx4.cxscheduler cimport sl_tout_proc, sl_enq_tout_after, sl_tid_t, sl_deq_tout
 
 cdef void sltimer_proc(int uniq, void *privptr1, sl_tid_t tid, void *privptr2) with gil:

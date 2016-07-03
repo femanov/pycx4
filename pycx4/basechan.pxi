@@ -1,7 +1,3 @@
-from cx4.cda cimport *
-
-from cx4.cx cimport sizeof_cxdtype, cxdtype_t, cx_time_t, rflags_t
-
 # check for cda exception
 cdef inline int cda_check_exception(int code) except -1:
     if code < 0:
@@ -27,7 +23,6 @@ cdef void evproc_update(int uniq, void *privptr1, cda_dataref_t ref, int reason,
     chan.prev_time = chan.time
     chan.time = <int64>timestr.sec * 1000000 + timestr.nsec / 1000
     chan.cb()
-
 
 # wrapper-class for low-level functions and channel registration
 cdef class BaseChan(CdaObject):
@@ -74,7 +69,7 @@ cdef class BaseChan(CdaObject):
                            0, <cda_dataref_evproc_t>NULL, NULL)
         cda_check_exception(ret)
         self.ref, self.name, self.dtype, self.max_nelems, self.first_cycle, self.itemsize =\
-            ret, name, dtype, max_nelems, True, sizeof_cxdtype(dtype)
+            ret, name, dtype, max_nelems, True, cx.sizeof_cxdtype(dtype)
 
         (<Context>self.context).save_chan(<void*>self)
 

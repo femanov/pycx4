@@ -1,7 +1,4 @@
 
-from cx4 cimport cx
-
-
         # CXRF_SERVER_MASK
         # CXRF_CLIENT_MASK
         #

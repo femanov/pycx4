@@ -1,11 +1,9 @@
 
-
 # C callback for context
 cdef void evproc_cont_cycle(int uniq, void *privptr1, cda_context_t cid, int reason,
                       int info_int, void *privptr2) with gil:
     cdef Context cont=<Context>(<event*>privptr2).objptr
     cont.serverCycle.emit(cont)
-
 
 
 cdef class Context(CdaObject):
@@ -25,7 +23,7 @@ cdef class Context(CdaObject):
             public object serverCycle
 
     def __init__(self, defpfx="cx::"):
-        CdaObject.__init__(self)
+        super(Context, self).__init__()
         cdef:
             int ret
             char *c_defpfx
