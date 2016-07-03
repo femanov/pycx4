@@ -1,5 +1,5 @@
 # scalar double channel
-cdef class Dchan(BaseChan):
+cdef class DChan(BaseChan):
     cdef:
         # all general properties defined in base classes
         readonly double val, prev_val, tolerance

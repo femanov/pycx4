@@ -22,6 +22,6 @@ cdef Context default_context=Context()
 include 'basechan.pxi'
 
 include 'dchan.pxi'
-include 'schan.pxi'
+include 'chan.pxi'
 include 'vchan.pxi'
 include 'strchan.pxi'

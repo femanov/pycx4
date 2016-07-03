@@ -1,5 +1,5 @@
 # vector-data channel class
-cdef class Vchan(BaseChan):
+cdef class VChan(BaseChan):
     cdef:
         readonly np.ndarray val
         readonly object npdtype
