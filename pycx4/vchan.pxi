@@ -1,3 +1,5 @@
+np.import_array()
+
 # vector-data channel class
 cdef class VChan(BaseChan):
     cdef:

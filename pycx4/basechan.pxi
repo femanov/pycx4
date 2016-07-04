@@ -42,8 +42,7 @@ cdef class BaseChan(CdaObject):
 
     IF SIGNAL_IMPL=='sl':
         cdef readonly:
-            Signal valueMeasured
-            Signal valueChanged
+            Signal valueMeasured, valueChanged, unresolved
     ELIF SIGNAL_IMPL=='Qt':
         cdef:
             object c_valueChanged, c_valueMeasured, c_unresolved
