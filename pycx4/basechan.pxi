@@ -22,6 +22,7 @@ cdef void evproc_update(int uniq, void *privptr1, cda_dataref_t ref, int reason,
     cda_check_exception( cda_get_ref_stat(chan.ref, &rflags, &timestr) )
     chan.prev_time = chan.time
     chan.time = <int64>timestr.sec * 1000000 + timestr.nsec / 1000
+    print 'control to chan.cb'
     chan.cb()
 
 # wrapper-class for low-level functions and channel registration
@@ -54,7 +55,7 @@ cdef class BaseChan(CdaObject):
         else: self.context = <void*>default_context
 
         IF SIGNAL_IMPL=='sl':
-            self.valueMeasured, self.valueMeasured, self.unresolved = Signal(), Signal(), Signal()
+            self.valueChanged, self.valueMeasured, self.unresolved = Signal(), Signal(), Signal()
         ELIF SIGNAL_IMPL=='Qt':
             self.c_valueChanged, self.c_valueMeasured, self.c_unresolved = SignalContainer(), SignalContainer(), SignalContainer()
             self.valueChanged, self.valueMeasured, self.unresolved = self.c_valueChanged.signal, self.c_valueMeasured.signal, self.c_unresolved.signal
