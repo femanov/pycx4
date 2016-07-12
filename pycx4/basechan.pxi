@@ -22,7 +22,6 @@ cdef void evproc_update(int uniq, void *privptr1, cda_dataref_t ref, int reason,
     cda_check_exception( cda_get_ref_stat(chan.ref, &rflags, &timestr) )
     chan.prev_time = chan.time
     chan.time = <int64>timestr.sec * 1000000 + timestr.nsec / 1000
-    print 'control to chan.cb'
     chan.cb()
 
 # wrapper-class for low-level functions and channel registration
