@@ -72,7 +72,7 @@ cdef class BaseChan(CdaObject):
 
         (<Context>self.context).save_chan(<void*>self)
 
-        self.add_event(CDA_REF_EVMASK_RSLVSTAT, <void*>evproc_rslvstat, <void*>self, NULL)
+        #self.add_event(CDA_REF_EVMASK_RSLVSTAT, <void*>evproc_rslvstat, <void*>self, NULL)
         self.add_event(CDA_REF_EVMASK_UPDATE,   <void*>evproc_update,   <void*>self, NULL)
         self.registered = 1
 
