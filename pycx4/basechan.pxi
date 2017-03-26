@@ -1,3 +1,5 @@
+from cpython cimport Py_INCREF
+
 # check for cda exception
 cdef inline int cda_check_exception(int code) except -1:
     if code < 0:
@@ -11,7 +13,8 @@ cdef void evproc_rslvstat(int uniq, void *privptr1, cda_dataref_t ref, int reaso
     cdef BaseChan chan = <BaseChan>(<event*>privptr2).objptr
     if <long>info_ptr == 0: # this is channel not found event
         chan.found=-1
-        print('channel name not resolved by server: %s' % (chan.name,))
+        print('channel name not resolved by server: %s' % chan.name)
+
 
 cdef void evproc_update(int uniq, void *privptr1, cda_dataref_t ref, int reason,
                         void *info_ptr, void *privptr2) with gil:
@@ -83,6 +86,10 @@ cdef class BaseChan(CdaObject):
 
     def __str__(self):
         return '<cda_channel: ref=%d, name=%s>' % (self.ref, self.name)
+
+    def short_name(self):
+        a = self.name.split('.')
+        return a[len(a)-1].split('@')[0]
 
     cdef void cb(self):
         #empty callback for overrideing
