@@ -16,11 +16,11 @@ cdef class StrChan(BaseChan):
             free(self.cval)
 
     cdef void cb(self):
-        len = self.get_data(0, self.max_nelems, <void*>self.cval)
+        c_len = self.get_data(0, self.max_nelems, <void*>self.cval)
         if PY_MAJOR_VERSION > 2:
-            self.val = (<bytes>self.cval[:len]).decode('UTF-8')
+            self.val = (<bytes>self.cval[:c_len]).decode('UTF-8')
         else:
-            self.val = self.cval[:len]
+            self.val = self.cval[:c_len]
         self.valueMeasured.emit(self)
         self.valueChanged.emit(self)
 
