@@ -27,6 +27,17 @@ cdef void evproc_update(int uniq, void *privptr1, cda_dataref_t ref, int reason,
     chan.time = <int64>timestr.sec * 1000000 + timestr.nsec / 1000
     chan.cb()
 
+cdef  void quant_update(int uniq, void *privptr1, cda_dataref_t ref, int reason,
+                        void *info_ptr, void *privptr2) with gil:
+    cdef:
+        CxAnyVal_t quant_raw
+        cxdtype_t quant_dtype
+        BaseChan chan = <BaseChan>(<event*>privptr2).objptr
+
+    res = cda_quant_of_ref(chan.ref, &quant_raw, &quant_dtype)
+    print(chan.name, quant_dtype, quant_raw)
+
+
 # wrapper-class for low-level functions and channel registration
 cdef class BaseChan(CdaObject):
     cdef readonly:
@@ -37,6 +48,7 @@ cdef class BaseChan(CdaObject):
         size_t itemsize
         int64 time, prev_time
         int found # -1 - not found, 0 - unknown, 1 found
+        double quant
 
     cdef:
         int first_cycle
@@ -76,8 +88,11 @@ cdef class BaseChan(CdaObject):
         (<Context>self.context).save_chan(<void*>self)
 
         #self.add_event(CDA_REF_EVMASK_RSLVSTAT, <void*>evproc_rslvstat, <void*>self, NULL)
-        self.add_event(CDA_REF_EVMASK_UPDATE,   <void*>evproc_update,   <void*>self, NULL)
+        self.add_event(CDA_REF_EVMASK_QUANTCHG, <void*>quant_update, <void*>self, NULL)
+        self.add_event(CDA_REF_EVMASK_UPDATE, <void*>evproc_update, <void*>self, NULL)
+
         self.registered = 1
+
 
     def __dealloc__(self):
         cda_del_chan(self.ref)

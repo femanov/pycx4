@@ -24,24 +24,35 @@ cdef extern from "cda.h" nogil:
         CDA_VARPARM_ERROR
 
     enum:
+        CDA_CONTEXT_OPT_NONE
+        CDA_CONTEXT_OPT_NO_OTHEROP
+        CDA_CONTEXT_OPT_IGN_UPDATE
+
+    enum:
         CDA_DATAREF_OPT_NONE
         CDA_DATAREF_OPT_PRIVATE
         CDA_DATAREF_OPT_NO_RD_CONV
         CDA_DATAREF_OPT_SHY
         CDA_DATAREF_OPT_FIND_ONLY
+        CDA_DATAREF_OPT_ON_UPDATE
+        CDA_DATAREF_OPT_rsrvd26
 
     enum:
         CDA_OPT_NONE
         CDA_OPT_IS_W
         CDA_OPT_READONLY
+        CDA_OPT_HAS_PARAM
+        CDA_OPT_RETVAL_RQD
         CDA_OPT_DO_EXEC
+        CDA_OPT_RD_FLA
+        CDA_OPT_WR_FLA
 
     enum:
-        CDA_PROCESS_SEVERE_ERR   #= -2, // Is used internally between cda_core and cda_d_*
-        CDA_PROCESS_ERR          #= -1,
-        CDA_PROCESS_DONE         #=  0,
-        CDA_PROCESS_FLAG_BUSY    #=  1 << 0,
-        CDA_PROCESS_FLAG_REFRESH #=  1 << 1,
+        CDA_PROCESS_SEVERE_ERR
+        CDA_PROCESS_ERR
+        CDA_PROCESS_DONE
+        CDA_PROCESS_FLAG_BUSY
+        CDA_PROCESS_FLAG_REFRESH
 
     # context events
     enum:
@@ -64,10 +75,14 @@ cdef extern from "cda.h" nogil:
        CDA_REF_EVMASK_RDSCHG
        CDA_REF_R_FRESHCHG
        CDA_REF_EVMASK_FRESHCHG
-       CDA_REF_R_LOCKSTAT
-       CDA_REF_EVMASK_LOCKSTAT
+       CDA_REF_R_QUANTCHG
+       CDA_REF_EVMASK_QUANTCHG
        CDA_REF_R_RSLVSTAT
        CDA_REF_EVMASK_RSLVSTAT
+       CDA_REF_R_CURVAL
+       CDA_REF_EVMASK_CURVAL
+       CDA_REF_R_LOCKSTAT
+       CDA_REF_EVMASK_LOCKSTAT
 
     enum:
         CDA_LOCK_RLS
@@ -165,6 +180,7 @@ cdef extern from "cda.h" nogil:
     int cda_nelems_of_ref        (cda_dataref_t ref)
     int cda_current_nelems_of_ref(cda_dataref_t ref)
     int cda_fresh_age_of_ref     (cda_dataref_t ref, cx_time_t *fresh_age_p)
+    int cda_quant_of_ref         (cda_dataref_t ref, CxAnyVal_t *q_p, cxdtype_t *q_dtype_p)
     int cda_current_dtype_of_ref (cda_dataref_t ref)
 
     int cda_strings_of_ref       (cda_dataref_t  ref,
@@ -180,7 +196,6 @@ cdef extern from "cda.h" nogil:
                                   int     *phys_count_p,
                                   double  **rds_p)
 
-
     int cda_status_of_ref_sid(cda_dataref_t ref)
 
     int cda_status_srvs_count(cda_context_t  cid)
@@ -188,8 +203,8 @@ cdef extern from "cda.h" nogil:
     const char *cda_status_srv_scheme(cda_context_t  cid, int nth)
     const char *cda_status_srv_name(cda_context_t cid, int nth)
 
-    int cda_add_server_conn  (cda_context_t  cid,
-                              const char     *srvref)
+    int cda_srvs_of_ref(cda_dataref_t ref, uint8 *conns_u, int conns_u_size)
+    int cda_add_server_conn(cda_context_t cid, const char *srvref)
 
     #/**********************/
     int cda_process_ref(cda_dataref_t ref, int options,
@@ -200,6 +215,7 @@ cdef extern from "cda.h" nogil:
                          CxAnyVal_t *curraw_p, cxdtype_t *curraw_dtype_p,
                          rflags_t *rflags_p, cx_time_t *timestamp_p)
 
+    int cda_rd_convert  (cda_dataref_t ref, double raw, double *result_p)
     int cda_snd_ref_data(cda_dataref_t ref, cxdtype_t dtype, int nelems, void *data)
     int cda_get_ref_data(cda_dataref_t ref, size_t ofs, size_t size, void *buf)
     int cda_get_ref_stat(cda_dataref_t ref, rflags_t *rflags_p, cx_time_t *timestamp_p)
