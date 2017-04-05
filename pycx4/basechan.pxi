@@ -1,11 +1,10 @@
-from cpython cimport Py_INCREF
 
 # check for cda exception
+# this is not correct. Exception can be raised on python's side, not in C
 cdef inline int cda_check_exception(int code) except -1:
     if code < 0:
         raise Exception("cda error: %s, errcode: %s" % (cda_last_err(), code))
     return 0
-
 
 # C callback function for ref's (channels)
 cdef void evproc_rslvstat(int uniq, void *privptr1, cda_dataref_t ref, int reason,
@@ -22,7 +21,7 @@ cdef void evproc_update(int uniq, void *privptr1, cda_dataref_t ref, int reason,
         cx_time_t timestr
         rflags_t rflags
         BaseChan chan = <BaseChan>(<event*>privptr2).objptr
-    cda_check_exception( cda_get_ref_stat(chan.ref, &rflags, &timestr) )
+    cda_check_exception( cda_get_ref_stat(ref, &rflags, &timestr) )
     chan.prev_time = chan.time
     chan.time = <int64>timestr.sec * 1000000 + timestr.nsec / 1000
     chan.cb()
@@ -30,12 +29,15 @@ cdef void evproc_update(int uniq, void *privptr1, cda_dataref_t ref, int reason,
 cdef  void quant_update(int uniq, void *privptr1, cda_dataref_t ref, int reason,
                         void *info_ptr, void *privptr2) with gil:
     cdef:
+        int res
         CxAnyVal_t quant_raw
         cxdtype_t quant_dtype
         BaseChan chan = <BaseChan>(<event*>privptr2).objptr
 
     res = cda_quant_of_ref(chan.ref, &quant_raw, &quant_dtype)
-    print(chan.name, quant_dtype, quant_raw)
+    res = cda_rd_convert(ref, aval_value(&quant_raw, quant_dtype), &chan.quant)
+    if chan.quant != 0:
+        print(chan.name, chan.quant)
 
 
 # wrapper-class for low-level functions and channel registration
@@ -87,7 +89,7 @@ cdef class BaseChan(CdaObject):
 
         (<Context>self.context).save_chan(<void*>self)
 
-        #self.add_event(CDA_REF_EVMASK_RSLVSTAT, <void*>evproc_rslvstat, <void*>self, NULL)
+        self.add_event(CDA_REF_EVMASK_RSLVSTAT, <void*>evproc_rslvstat, <void*>self, NULL)
         self.add_event(CDA_REF_EVMASK_QUANTCHG, <void*>quant_update, <void*>self, NULL)
         self.add_event(CDA_REF_EVMASK_UPDATE, <void*>evproc_update, <void*>self, NULL)
 
