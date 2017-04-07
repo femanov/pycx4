@@ -26,17 +26,24 @@ cdef void evproc_update(int uniq, void *privptr1, cda_dataref_t ref, int reason,
     chan.time = <int64>timestr.sec * 1000000 + timestr.nsec / 1000
     chan.cb()
 
-cdef  void quant_update(int uniq, void *privptr1, cda_dataref_t ref, int reason,
+cdef void quant_update(int uniq, void *privptr1, cda_dataref_t ref, int reason,
                         void *info_ptr, void *privptr2) with gil:
     cdef:
         int res
         CxAnyVal_t quant_raw
         cxdtype_t quant_dtype
         BaseChan chan = <BaseChan>(<event*>privptr2).objptr
+        double quant_draw, val, shift
 
     res = cda_quant_of_ref(chan.ref, &quant_raw, &quant_dtype)
-    res = cda_rd_convert(ref, aval_value(&quant_raw, quant_dtype), &chan.quant)
-    if chan.quant != 0:
+    quant_draw = aval_value(&quant_raw, quant_dtype)
+    if quant_draw == 0:
+        chan.quant = 0
+        return
+    else:
+        res = cda_rd_convert(ref, 0, &shift)
+        res = cda_rd_convert(ref, quant_draw, &val)
+        chan.quant = val - shift
         print(chan.name, chan.quant)
 
 
