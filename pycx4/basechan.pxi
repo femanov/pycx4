@@ -44,7 +44,6 @@ cdef void quant_update(int uniq, void *privptr1, cda_dataref_t ref, int reason,
         res = cda_rd_convert(ref, 0, &shift)
         res = cda_rd_convert(ref, quant_draw, &val)
         chan.quant = val - shift
-        print(chan.name, chan.quant)
 
 
 # wrapper-class for low-level functions and channel registration

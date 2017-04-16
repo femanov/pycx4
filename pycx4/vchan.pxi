@@ -14,7 +14,8 @@ cdef class VChan(BaseChan):
 
     cdef void cb(self):
         c_len = self.get_data(0, self.itemsize * self.max_nelems, <void*>self.buf_val.data)
-        self.val = self.buf_val[:c_len]
+        nelems_read = int(c_len/self.itemsize)
+        self.val = self.buf_val[:nelems_read]
         self.valueMeasured.emit(self)
         self.valueChanged.emit(self)
 
