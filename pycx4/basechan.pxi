@@ -14,6 +14,13 @@ cdef void evproc_rslvstat(int uniq, void *privptr1, cda_dataref_t ref, int reaso
         chan.found=-1
         print('channel name not resolved by server: %s' % chan.name)
 
+cdef void evproc_update_init(int uniq, void *privptr1, cda_dataref_t ref, int reason,
+                          void *info_ptr, void *privptr2) with gil:
+    cdef BaseChan chan = <BaseChan>(<event*>privptr2).objptr
+
+    chan.initialized = 1
+    chan.del_event(CDA_REF_EVMASK_UPDATE, <void*>evproc_update_init, <void*>chan, NULL)
+
 
 cdef void evproc_update(int uniq, void *privptr1, cda_dataref_t ref, int reason,
                         void *info_ptr, void *privptr2) with gil:
@@ -25,6 +32,7 @@ cdef void evproc_update(int uniq, void *privptr1, cda_dataref_t ref, int reason,
     chan.prev_time = chan.time
     chan.time = <int64>timestr.sec * 1000000 + timestr.nsec / 1000
     chan.cb()
+
 
 cdef void quant_update(int uniq, void *privptr1, cda_dataref_t ref, int reason,
                         void *info_ptr, void *privptr2) with gil:
@@ -59,9 +67,8 @@ cdef class BaseChan(CdaObject):
         double quant
 
     cdef:
-        int first_cycle
+        int registered, first_cycle, initialized
         void *context
-        int registered
 
     IF SIGNAL_IMPL=='sl':
         cdef readonly:
@@ -90,17 +97,24 @@ cdef class BaseChan(CdaObject):
         ret = cda_add_chan((<Context>self.context).cid, NULL, c_name, 0, dtype, max_nelems,
                            0, <cda_dataref_evproc_t>NULL, NULL)
         cda_check_exception(ret)
-        self.ref, self.name, self.dtype, self.max_nelems, self.first_cycle, self.itemsize =\
-            ret, name, dtype, max_nelems, True, cx.sizeof_cxdtype(dtype)
+        self.ref, self.name, self.dtype, self.max_nelems, self.itemsize =\
+            ret, name, dtype, max_nelems, cx.sizeof_cxdtype(dtype)
 
         (<Context>self.context).save_chan(<void*>self)
 
+        # events which can be regular
         self.add_event(CDA_REF_EVMASK_RSLVSTAT, <void*>evproc_rslvstat, <void*>self, NULL)
         self.add_event(CDA_REF_EVMASK_QUANTCHG, <void*>quant_update, <void*>self, NULL)
         self.add_event(CDA_REF_EVMASK_UPDATE, <void*>evproc_update, <void*>self, NULL)
 
-        self.registered = 1
+        # initialization events (will be unregistered when get)
 
+        # this one makes "initialized" flag
+        # need to rewrite with function pointers replace
+        self.add_event(CDA_REF_EVMASK_UPDATE, <void*>evproc_update_init, <void*>self, NULL)
+
+
+        self.registered, self.first_cycle, self.initialized = 1, 1, 0
 
     def __dealloc__(self):
         cda_del_chan(self.ref)
