@@ -31,7 +31,7 @@ extensions = [
                             cx4lib + '/misc',
                            ]
               ),
-    Extension('pycx4.qcda', ['./pycx4/qcda' + ext],
+    Extension('pycx4.q4cda', ['./pycx4/q4cda' + ext],
           include_dirs=[numpy.get_include(), cx4include, '/usr/include/x86_64-linux-gnu/qt4/QtCore',],
           libraries=['cda', 'cx_async', 'useful', 'misc', 'Qt4cxscheduler', 'QtCore'],
           library_dirs=[cx4lib + '/cda',
