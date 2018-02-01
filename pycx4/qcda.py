@@ -22,7 +22,7 @@ if QT_LIB is None:
     ImportError("PyQt not found. it's required for qcda")
 
 if QT_LIB == 'PyQt5':
-    import q5cda as cda
+    import pycx4.q5cda as cda
 
 elif QT_LIB == 'PyQt4':
-    import q4cda as cda
+    import pycx4.q4cda as cda

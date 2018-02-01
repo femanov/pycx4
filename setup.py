@@ -58,7 +58,6 @@ extensions = [
 
 # Cython directives
 directives = {
-    'gdb_debug': True,
     'profile':   False,
     'linetrace': True,
     'c_string_type': 'bytes',

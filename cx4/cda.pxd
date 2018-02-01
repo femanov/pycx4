@@ -97,7 +97,7 @@ cdef extern from "cda.h" nogil:
         CDA_SERVERSTATUS_ALMOSTREADY
         CDA_SERVERSTATUS_NORMAL
 
-    inline int cda_ref_is_sensible(cda_dataref_t ref)
+    int cda_ref_is_sensible(cda_dataref_t ref)
 
     ctypedef void (*cda_context_evproc_t)(int uniq, void *privptr1, cda_context_t cid, int reason, int info_int, void *privptr2)
 

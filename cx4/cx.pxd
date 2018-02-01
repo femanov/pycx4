@@ -42,8 +42,8 @@ cdef extern from "cx.h" nogil:
         CXDTYPE_TEXT
         CXDTYPE_UCTEXT
 
-    inline size_t sizeof_cxdtype(cxdtype_t t)
-    inline int    reprof_cxdtype(cxdtype_t t)
+    size_t sizeof_cxdtype(cxdtype_t t)
+    int    reprof_cxdtype(cxdtype_t t)
 
 
     enum: # flags
