@@ -27,3 +27,5 @@ include 'dchan.pxi'
 include 'chan.pxi'
 include 'vchan.pxi'
 include 'strchan.pxi'
+
+include 'cda_all.pxi'

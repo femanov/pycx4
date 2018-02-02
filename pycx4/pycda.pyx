@@ -25,3 +25,8 @@ include 'dchan.pxi'
 include 'chan.pxi'
 include 'vchan.pxi'
 include 'strchan.pxi'
+
+include 'cda_all.pxi'
+
+# add cx scheduler specific simbols
+__all__ += ['main_loop', 'break_', 'Timer', 'Signal']

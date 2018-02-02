@@ -5,7 +5,6 @@ from PyQt5.QtNetwork import QAbstractSocket
 
 include 'imports.pxi'
 
-
 include 'qt_signalcontainer.pxi'
 
 # conpile-time define for contitional compilation
@@ -27,3 +26,5 @@ include 'dchan.pxi'
 include 'chan.pxi'
 include 'vchan.pxi'
 include 'strchan.pxi'
+
+include 'cda_all.pxi'
