@@ -36,6 +36,7 @@ cdef extern from "cda.h" nogil:
         CDA_DATAREF_OPT_FIND_ONLY
         CDA_DATAREF_OPT_ON_UPDATE
         CDA_DATAREF_OPT_rsrvd26
+        CDA_DATAREF_OPT_NO_WR_WAIT
 
     enum:
         CDA_OPT_NONE

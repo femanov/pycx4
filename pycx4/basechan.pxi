@@ -78,7 +78,7 @@ cdef class BaseChan(CdaObject):
             object c_valueChanged, c_valueMeasured, c_unresolved
             public object valueChanged, valueMeasured, unresolved
 
-    def __init__(self, str name, object context=None, cxdtype_t dtype=CXDTYPE_DOUBLE, int max_nelems=1):
+    def __init__(self, str name, object context=None, cxdtype_t dtype=CXDTYPE_DOUBLE, int max_nelems=1, **kwargs):
         CdaObject.__init__(self)
         if isinstance(context, Context): self.context = <void*>context
         else: self.context = <void*>default_context
@@ -93,8 +93,35 @@ cdef class BaseChan(CdaObject):
         cdef:
             char *c_name = b_name
             int ret
+            int options = 0
 
-        ret = cda_add_chan((<Context>self.context).cid, NULL, c_name, 0, dtype, max_nelems,
+        if 'private' in kwargs:
+            if kwargs['private']:
+                options += CDA_DATAREF_OPT_PRIVATE
+
+        if 'no_rd_conv' in kwargs:
+            if kwargs['no_rd_conv']:
+                options += CDA_DATAREF_OPT_NO_RD_CONV
+
+        if 'shy' in kwargs:
+            if kwargs['shy']:
+                options += CDA_DATAREF_OPT_SHY
+
+        if 'find_only' in kwargs:
+            if kwargs['find_only']:
+                options += CDA_DATAREF_OPT_FIND_ONLY
+
+        if 'on_update' in kwargs:
+            if kwargs['on_update']:
+                options += CDA_DATAREF_OPT_ON_UPDATE
+
+        if 'no_wr_wait' in kwargs:
+            if kwargs['no_wr_wait']:
+                options += CDA_DATAREF_OPT_NO_WR_WAIT
+
+        print('options', options)
+
+        ret = cda_add_chan((<Context>self.context).cid, NULL, c_name, options, dtype, max_nelems,
                            0, <cda_dataref_evproc_t>NULL, NULL)
         cda_check_exception(ret)
         self.ref, self.name, self.dtype, self.max_nelems, self.itemsize =\

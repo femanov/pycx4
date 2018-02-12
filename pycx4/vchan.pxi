@@ -6,8 +6,8 @@ cdef class VChan(BaseChan):
         readonly np.ndarray val, buf_val
         readonly object npdtype
 
-    def __init__(self, str name, object context=None, cxdtype_t dtype=CXDTYPE_DOUBLE, int max_nelems=1):
-        BaseChan.__init__(self, name, context, dtype, max_nelems)
+    def __init__(self, str name, object context=None, cxdtype_t dtype=CXDTYPE_DOUBLE, int max_nelems=1, **kwargs):
+        BaseChan.__init__(self, name, context, dtype, max_nelems, **kwargs)
         self.npdtype = cxdtype2np(dtype)
         self.buf_val = np.zeros(max_nelems, self.npdtype, order='C')
         self.val = np.zeros(0, self.npdtype, order='C')

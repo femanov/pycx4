@@ -22,15 +22,25 @@ cdef class Context(CdaObject):
             object c_serverCycle
             public object serverCycle
 
-    def __init__(self, defpfx="cx::"):
+    def __init__(self, defpfx="cx::", **kwargs):
         super(Context, self).__init__()
         cdef:
             int ret
+            int options = 0
             char *c_defpfx
         ascii_pfx = defpfx.encode("ascii") # encode to ascii
         c_defpfx = ascii_pfx  # convert to char*
 
-        ret = cda_new_context(0, NULL, c_defpfx, 0, NULL, 0, <cda_context_evproc_t>NULL, NULL)
+
+        if 'other_opp_flag' in kwargs:
+            if kwargs['other_opp_flag']:
+                options += CDA_CONTEXT_OPT_NO_OTHEROP
+
+        if 'ignore_update' in kwargs:
+            if kwargs['ignore_update']:
+                options += CDA_CONTEXT_OPT_IGN_UPDATE
+
+        ret = cda_new_context(0, NULL, c_defpfx, options, NULL, 0, <cda_context_evproc_t>NULL, NULL)
         cda_check_exception(ret)
         self.cid, self.defpfx, self.chans, self.channum = ret, defpfx, NULL, 0
 

@@ -2,6 +2,7 @@ import sys
 import importlib
 
 __all__ = ['QT_LIB']
+DChan = None
 
 qts = ['PyQt5', 'PyQt4']
 QT_LIB = None
