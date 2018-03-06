@@ -93,7 +93,7 @@ cdef class BaseChan(CdaObject):
         cdef:
             char *c_name = b_name
             int ret
-            int options = 0
+            unsigned int options = 0
 
         if 'private' in kwargs:
             if kwargs['private']:
@@ -102,6 +102,7 @@ cdef class BaseChan(CdaObject):
         if 'no_rd_conv' in kwargs:
             if kwargs['no_rd_conv']:
                 options += CDA_DATAREF_OPT_NO_RD_CONV
+
 
         if 'shy' in kwargs:
             if kwargs['shy']:
@@ -118,8 +119,6 @@ cdef class BaseChan(CdaObject):
         if 'no_wr_wait' in kwargs:
             if kwargs['no_wr_wait']:
                 options += CDA_DATAREF_OPT_NO_WR_WAIT
-
-        print('options', options)
 
         ret = cda_add_chan((<Context>self.context).cid, NULL, c_name, options, dtype, max_nelems,
                            0, <cda_dataref_evproc_t>NULL, NULL)
@@ -139,7 +138,6 @@ cdef class BaseChan(CdaObject):
         # this one makes "initialized" flag
         # need to rewrite with function pointers replace
         self.add_event(CDA_REF_EVMASK_UPDATE, <void*>evproc_update_init, <void*>self, NULL)
-
 
         self.registered, self.first_cycle, self.initialized = 1, 1, 0
 

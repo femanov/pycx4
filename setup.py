@@ -30,8 +30,12 @@ extensions = [
                             cx4lib + '/useful',
                             cx4lib + '/misc',
                            ]
-              ),
-    Extension('pycx4.q4cda', ['./pycx4/q4cda' + ext],
+              )]
+
+try:
+    import PyQt4
+
+    extensions.append(Extension('pycx4.q4cda', ['./pycx4/q4cda' + ext],
           include_dirs=[numpy.get_include(), cx4include, '/usr/include/x86_64-linux-gnu/qt4/QtCore',],
           libraries=['cda', 'cx_async', 'useful', 'misc', 'Qt4cxscheduler', 'QtCore'],
           library_dirs=[cx4lib + '/cda',
@@ -39,10 +43,15 @@ extensions = [
                         cx4lib + '/Qcxscheduler',
                         cx4lib + '/useful',
                         cx4lib + '/misc',
-
                        ]
-         ),
-    Extension('pycx4.q5cda', ['./pycx4/q5cda' + ext],
+         ))
+except ImportError:
+    pass
+
+try:
+    import PyQt5
+
+    extensions.append(Extension('pycx4.q5cda', ['./pycx4/q5cda' + ext],
               include_dirs=[numpy.get_include(), cx4include, '/usr/include/x86_64-linux-gnu/qt5/QtCore', ],
               libraries=['cda', 'cx_async', 'useful', 'misc', 'Qt5cxscheduler', 'Qt5Core'],
               library_dirs=[cx4lib + '/cda',
@@ -50,10 +59,10 @@ extensions = [
                             cx4lib + '/Qcxscheduler',
                             cx4lib + '/useful',
                             cx4lib + '/misc',
-
                             ]
-              )
-]
+              ))
+except ImportError:
+    pass
 
 
 # Cython directives
@@ -94,7 +103,6 @@ setup(
         "Operating System :: POSIX :: Linux",
         "Programming Language :: Python",
         "Programming Language :: Python :: 2",
-        "Programming Language :: Python :: 2.6",
         "Programming Language :: Python :: 2.7",
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.2",
