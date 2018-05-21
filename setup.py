@@ -3,17 +3,18 @@ from setuptools.extension import Extension
 import numpy
 import sys
 import os.path
-from pycx4.aux import cxpath
+from pycx4.aux import cx_installpath
 from pycx4.version import __version__
 
-cxdir = cxpath()
+cxdir = cx_installpath()
 if cxdir is None:
     print('Error: Unable to locate CX')
     sys.exit(1)
+else:
+    print('Using cx installed in:', cxdir)
 
-cx4lib = cxdir + '/4cx/src/lib'
-cx4include = cxdir + '/4cx/src/include'
-
+cx_include = cxdir + '/include'
+cx_lib = cxdir + '/lib'
 
 USE_CYTHON = False
 ext = '.c'
@@ -23,27 +24,18 @@ if os.path.isfile('./pycx4/pycda.pyx'):
 
 extensions = [
     Extension('pycx4.pycda', ['./pycx4/pycda' + ext],
-              include_dirs=[numpy.get_include(), cx4include],
+              include_dirs=[numpy.get_include(), cx_include],
               libraries=['cda', 'cx_async', 'useful', 'misc', 'cxscheduler'],
-              library_dirs=[cx4lib + '/cda',
-                            cx4lib + '/cxlib',
-                            cx4lib + '/useful',
-                            cx4lib + '/misc',
-                           ]
+              library_dirs=[cx_lib]
               )]
 
 try:
     import PyQt4
 
     extensions.append(Extension('pycx4.q4cda', ['./pycx4/q4cda' + ext],
-          include_dirs=[numpy.get_include(), cx4include, '/usr/include/x86_64-linux-gnu/qt4/QtCore',],
+          include_dirs=[numpy.get_include(), cx_include, '/usr/include/x86_64-linux-gnu/qt4/QtCore',],
           libraries=['cda', 'cx_async', 'useful', 'misc', 'Qt4cxscheduler', 'QtCore'],
-          library_dirs=[cx4lib + '/cda',
-                        cx4lib + '/cxlib',
-                        cx4lib + '/Qcxscheduler',
-                        cx4lib + '/useful',
-                        cx4lib + '/misc',
-                       ]
+          library_dirs=[cx_lib]
          ))
 except ImportError:
     pass
@@ -52,14 +44,9 @@ try:
     import PyQt5
 
     extensions.append(Extension('pycx4.q5cda', ['./pycx4/q5cda' + ext],
-              include_dirs=[numpy.get_include(), cx4include, '/usr/include/x86_64-linux-gnu/qt5/QtCore', ],
+              include_dirs=[numpy.get_include(), cx_include, '/usr/include/x86_64-linux-gnu/qt5/QtCore', ],
               libraries=['cda', 'cx_async', 'useful', 'misc', 'Qt5cxscheduler', 'Qt5Core'],
-              library_dirs=[cx4lib + '/cda',
-                            cx4lib + '/cxlib',
-                            cx4lib + '/Qcxscheduler',
-                            cx4lib + '/useful',
-                            cx4lib + '/misc',
-                            ]
+              library_dirs=[cx_lib]
               ))
 except ImportError:
     pass
