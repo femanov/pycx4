@@ -142,9 +142,10 @@ cdef class BaseChan(CdaObject):
         self.registered, self.first_cycle, self.initialized = 1, 1, 0
 
     def __dealloc__(self):
-        cda_del_chan(self.ref)
         if self.registered:
             (<Context>self.context).drop_chan(<void*>self)
+            cda_del_chan(self.ref)
+            self.registered = 0
 
     def __str__(self):
         return '<cda_channel: ref=%d, name=%s>' % (self.ref, self.name)

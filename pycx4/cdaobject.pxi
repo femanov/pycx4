@@ -10,7 +10,10 @@ cdef class CdaObject:
         self.evnum = 0
 
     def __dealloc__(self):
-        free(self.events)
+        if self.evnum > 0:
+            free(self.events)
+            self.events = NULL
+            self.evnum = 0
 
     cdef int add_event(self,int evmask, void *evproc, void *objptr, void *userptr):
         cdef:
@@ -60,7 +63,9 @@ cdef class CdaObject:
         self.unregister_event(self.events[ev_ind])
         if self.evnum == 1:
             free(self.events[ev_ind])
+            # looks like self.events[ev_ind] = NULL - not needed here
             free(self.events)
+            self.events = NULL
         else:
             memmove(&(self.events[ev_ind]), &(self.events[self.evnum-1]), sizeof(event*))
             tmp = realloc(self.events, sizeof(event*) * (self.evnum - 1))

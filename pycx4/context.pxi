@@ -54,8 +54,10 @@ cdef class Context(CdaObject):
         if self.cid > 0:
             cda_check_exception( cda_del_context(self.cid) )
             self.cid = 0
-        free(self.chans)
-        self.channum = 0
+        if self.channum > 0:
+            free(self.chans)
+            self.chans = NULL
+            self.channum = 0
 
     def __str__(self):
         return '<CdaContext: cid=%d, defpfx=%s, channum=%d>' % (self.cid, self.defpfx, self.channum)
@@ -80,6 +82,7 @@ cdef class Context(CdaObject):
             if chan == self.chans[ind]:
                 if self.channum == 1:
                     free(self.chans)
+                    self.chans = NULL
                 else:
                     memmove(&(self.chans[ind]), &(self.chans[self.channum-1]), sizeof(void*) )
                     tmp = realloc(<void*>self.chans, sizeof(void*) * (self.channum-1))

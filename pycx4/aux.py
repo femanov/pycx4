@@ -3,6 +3,7 @@ import pwd
 
 def cx_installpath():
     search_pathes = []
+    print(os.getenv('HOME'))
 
     if os.getenv('CXDIR'):
         search_pathes.append(os.getenv('CXDIR') + '/4cx/exports')
@@ -27,4 +28,5 @@ def cx_installpath():
 
 
 if __name__ == '__main__':
+
     print('using cx install path:', cx_installpath())

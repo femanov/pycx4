@@ -94,13 +94,8 @@ cdef extern from "cx.h" nogil:
         CXCF_FLAG_HWERR_MASK
         CXCF_FLAG_SFERR_MASK
         CXCF_FLAG_SYSERR_MASK
-
         CXCF_FLAG_ALARM_MASK
         CXCF_FLAG_COLOR_MASK
-        CXCF_FLAG_COLOR_WEIRD
-        CXCF_FLAG_COLOR_RED
-        CXCF_FLAG_COLOR_YELLOW
-
         CXCF_FLAG_4WRONLY_MASK
 
     enum:
