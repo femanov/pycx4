@@ -29,6 +29,7 @@ cdef void evproc_update(int uniq, void *privptr1, cda_dataref_t ref, int reason,
         rflags_t rflags
         BaseChan chan = <BaseChan>(<event*>privptr2).objptr
     cda_check_exception( cda_get_ref_stat(ref, &rflags, &timestr) )
+
     chan.prev_time = chan.time
     chan.time = <int64>timestr.sec * 1000000 + timestr.nsec / 1000
     chan.cb()
@@ -95,30 +96,24 @@ cdef class BaseChan(CdaObject):
             int ret
             unsigned int options = 0
 
-        if 'private' in kwargs:
-            if kwargs['private']:
-                options += CDA_DATAREF_OPT_PRIVATE
+        # may be cycle?
+        if kwargs.get('private', False):
+            options += CDA_DATAREF_OPT_PRIVATE
 
-        if 'no_rd_conv' in kwargs:
-            if kwargs['no_rd_conv']:
-                options += CDA_DATAREF_OPT_NO_RD_CONV
+        if kwargs.get('no_rd_conv', False):
+            options += CDA_DATAREF_OPT_NO_RD_CONV
 
+        if kwargs.get('shy', False):
+            options += CDA_DATAREF_OPT_SHY
 
-        if 'shy' in kwargs:
-            if kwargs['shy']:
-                options += CDA_DATAREF_OPT_SHY
+        if kwargs.get('find_only', False):
+            options += CDA_DATAREF_OPT_FIND_ONLY
 
-        if 'find_only' in kwargs:
-            if kwargs['find_only']:
-                options += CDA_DATAREF_OPT_FIND_ONLY
+        if kwargs.get('on_update', False):
+            options += CDA_DATAREF_OPT_ON_UPDATE
 
-        if 'on_update' in kwargs:
-            if kwargs['on_update']:
-                options += CDA_DATAREF_OPT_ON_UPDATE
-
-        if 'no_wr_wait' in kwargs:
-            if kwargs['no_wr_wait']:
-                options += CDA_DATAREF_OPT_NO_WR_WAIT
+        if kwargs.get('no_wr_wait', False):
+            options += CDA_DATAREF_OPT_NO_WR_WAIT
 
         ret = cda_add_chan((<Context>self.context).cid, NULL, c_name, options, dtype, max_nelems,
                            0, <cda_dataref_evproc_t>NULL, NULL)

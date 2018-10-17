@@ -10,6 +10,11 @@ def cx_installpath():
         search_pathes.append(os.getenv('CXDIR') + '/exports')
 
     search_pathes.append(os.getenv('HOME') + '/cx/4cx/exports')
+
+    if os.getenv('USER') == "root":
+        search_pathes.append(pwd.getpwnam(os.getenv('USER')).pw_dir + '/4pult')
+        search_pathes.append(pwd.getpwnam(os.getenv('USER')).pw_dir + '/cx/4cx/exports')
+
     try:
         search_pathes.append(pwd.getpwnam('oper').pw_dir + '/4pult')
     except KeyError:
