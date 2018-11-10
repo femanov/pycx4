@@ -66,9 +66,8 @@ cdef class BaseChan(CdaObject):
         int64 time, prev_time
         int found # -1 - not found, 0 - unknown, 1 found
         double quant
-
-    cdef:
         int registered, first_cycle, initialized
+    cdef:
         void *context
 
     IF SIGNAL_IMPL=='sl':
@@ -134,7 +133,7 @@ cdef class BaseChan(CdaObject):
         # need to rewrite with function pointers replace
         self.add_event(CDA_REF_EVMASK_UPDATE, <void*>evproc_update_init, <void*>self, NULL)
 
-        self.registered, self.first_cycle, self.initialized = 1, 1, 0
+        self.registered, self.first_cycle, self.initialized = True, True, False
 
     def __dealloc__(self):
         if self.registered:
