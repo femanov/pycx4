@@ -114,6 +114,9 @@ cdef class BaseChan(CdaObject):
         if kwargs.get('no_wr_wait', False):
             options += CDA_DATAREF_OPT_NO_WR_WAIT
 
+        if kwargs.get('debug', False):
+            options += CDA_DATAREF_OPT_DEBUG
+
         ret = cda_add_chan((<Context>self.context).cid, NULL, c_name, options, dtype, max_nelems,
                            0, <cda_dataref_evproc_t>NULL, NULL)
         cda_check_exception(ret)
