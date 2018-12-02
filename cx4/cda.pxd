@@ -99,6 +99,11 @@ cdef extern from "cda.h" nogil:
         CDA_SERVERSTATUS_ALMOSTREADY
         CDA_SERVERSTATUS_NORMAL
 
+    enum:
+        CDA_RSLVSTAT_NOTFOUND
+        CDA_RSLVSTAT_SEARCHING
+        CDA_RSLVSTAT_FOUND
+
     int cda_ref_is_sensible(cda_dataref_t ref)
 
     ctypedef void (*cda_context_evproc_t)(int uniq, void *privptr1, cda_context_t cid, int reason, int info_int, void *privptr2)
@@ -125,7 +130,7 @@ cdef extern from "cda.h" nogil:
                                void *privptr2)
 
     # Channels management
-    cda_dataref_t  cda_add_chan   (cda_context_t         cid,
+    cda_dataref_t  cda_add_chan(cda_context_t         cid,
                                const char           *base,
                                const char           *spec,
                                int                   flags,
@@ -135,22 +140,23 @@ cdef extern from "cda.h" nogil:
                                cda_dataref_evproc_t  evproc,
                                void                 *privptr2)
 
-    int            cda_del_chan   (cda_dataref_t ref)
+    int            cda_del_chan(cda_dataref_t ref)
+    int            cda_set_type(cda_dataref_t ref, cxdtype_t dtype, int max_nelems)
 
-    int            cda_add_dataref_evproc(cda_dataref_t         ref,
+    int            cda_add_dataref_evproc(cda_dataref_t     ref,
                                       int                   evmask,
                                       cda_dataref_evproc_t  evproc,
                                       void                 *privptr2)
 
-    int            cda_del_dataref_evproc(cda_dataref_t         ref,
+    int            cda_del_dataref_evproc(cda_dataref_t     ref,
                                       int                   evmask,
                                       cda_dataref_evproc_t  evproc,
                                       void                 *privptr2)
 
-    int            cda_lock_chans (int count, cda_dataref_t *refs,
+    int            cda_lock_chans(int count, cda_dataref_t *refs,
                                int operation)
 
-    char *cda_combine_base_and_spec(cda_context_t         cid,
+    char *cda_combine_base_and_spec(cda_context_t     cid,
                                 const char           *base,
                                 const char           *spec,
                                 char                 *namebuf,
@@ -158,9 +164,13 @@ cdef extern from "cda.h" nogil:
 
     # Simplified channels API
 
-    cda_dataref_t cda_add_dchan(cda_context_t  cid, const char    *name)
-    int cda_get_dcval(cda_dataref_t  ref, double *v_p)
-    int cda_set_dcval(cda_dataref_t  ref, double  val)
+    cda_dataref_t cda_add_dchan(cda_context_t cid, const char *name)
+    int cda_get_dcval(cda_dataref_t ref, double *v_p)
+    int cda_set_dcval(cda_dataref_t ref, double  val)
+
+    cda_dataref_t cda_add_ichan(cda_context_t cid, const char *name)
+    int cda_get_icval(cda_dataref_t ref, int *v_p)
+    int cda_set_icval(cda_dataref_t ref, int val)
 
     # Formulae management
     cda_dataref_t cda_add_formula(cda_context_t         cid,
@@ -179,7 +189,7 @@ cdef extern from "cda.h" nogil:
     #/**/
     int cda_src_of_ref           (cda_dataref_t ref, const char **src_p)
     int cda_dtype_of_ref         (cda_dataref_t ref)
-    int cda_nelems_of_ref        (cda_dataref_t ref)
+    int cda_max_nelems_of_ref    (cda_dataref_t ref)
     int cda_current_nelems_of_ref(cda_dataref_t ref)
     int cda_fresh_age_of_ref     (cda_dataref_t ref, cx_time_t *fresh_age_p)
     int cda_quant_of_ref         (cda_dataref_t ref, CxAnyVal_t *q_p, cxdtype_t *q_dtype_p)
@@ -197,6 +207,14 @@ cdef extern from "cda.h" nogil:
     int cda_phys_rds_of_ref      (cda_dataref_t  ref,
                                   int     *phys_count_p,
                                   double  **rds_p)
+
+    int cda_hwinfo_of_ref        (cda_dataref_t  ref,
+                                  int       *rw_p,
+                                  cxdtype_t *dtype_p,
+                                  int       *nelems_p,
+                                  int       *srv_hwid_p,
+                                  int       *cln_hwr_p)
+
 
     int cda_status_of_ref_sid(cda_dataref_t ref)
 
@@ -216,6 +234,11 @@ cdef extern from "cda.h" nogil:
                          double     *curv_p,
                          CxAnyVal_t *curraw_p, cxdtype_t *curraw_dtype_p,
                          rflags_t *rflags_p, cx_time_t *timestamp_p)
+    int cda_get_ref_ival(cda_dataref_t ref,
+                         int        *curv_p,
+                         CxAnyVal_t *curraw_p, cxdtype_t *curraw_dtype_p,
+                         rflags_t   *rflags_p, cx_time_t *timestamp_p)
+
 
     int cda_rd_convert  (cda_dataref_t ref, double raw, double *result_p)
     int cda_snd_ref_data(cda_dataref_t ref, cxdtype_t dtype, int nelems, void *data)
