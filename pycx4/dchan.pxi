@@ -1,5 +1,12 @@
 # scalar double channel
 cdef class DChan(BaseChan):
+    """
+    One-double channel
+
+    val - double last-known value
+    prev_val - previous value
+    tolerance - tolerance of emitting valueChanged signal
+    """
     cdef:
         # all general properties defined in base classes
         readonly double val, prev_val, tolerance

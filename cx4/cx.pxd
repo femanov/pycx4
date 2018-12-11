@@ -1,5 +1,5 @@
 
-from misc_types cimport uint8, uint32, int32, int64
+from .misc_types cimport uint8, uint32, int32, int64
 
 
 cdef extern from "cx.h" nogil:

@@ -1,5 +1,5 @@
 
-from misc_types cimport *
+from .misc_types cimport *
 
 cdef extern from "cx_common_types.h" nogil:
     ctypedef unsigned long         CxPixel

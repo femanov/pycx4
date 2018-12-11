@@ -10,9 +10,11 @@ cdef inline int cda_check_exception(int code) except -1:
 cdef void evproc_rslvstat(int uniq, void *privptr1, cda_dataref_t ref, int reason,
                           void *info_ptr, void *privptr2) with gil:
     cdef BaseChan chan = <BaseChan>(<event*>privptr2).objptr
+    print("info", <long>info_ptr)
     if <long>info_ptr == 0: # this is channel not found event
         chan.found=-1
         print('channel name not resolved by server: %s' % chan.name)
+
 
 cdef void evproc_update_init(int uniq, void *privptr1, cda_dataref_t ref, int reason,
                           void *info_ptr, void *privptr2) with gil:

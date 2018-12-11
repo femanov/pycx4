@@ -54,6 +54,7 @@ except ImportError:
 
 # Cython directives
 directives = {
+    'language_level': 3,
     'profile':   False,
     'linetrace': True,
     'c_string_type': 'bytes',
