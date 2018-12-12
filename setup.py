@@ -56,7 +56,7 @@ except ImportError:
 directives = {
     'language_level': 3,
     'profile':   False,
-    'linetrace': True,
+    'linetrace': False,
     'c_string_type': 'bytes',
     'c_string_encoding': 'ascii',
     'boundscheck': False,

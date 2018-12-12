@@ -10,18 +10,15 @@ cdef inline int cda_check_exception(int code) except -1:
 cdef void evproc_rslvstat(int uniq, void *privptr1, cda_dataref_t ref, int reason,
                           void *info_ptr, void *privptr2) with gil:
     cdef BaseChan chan = <BaseChan>(<event*>privptr2).objptr
-    print("info", <long>info_ptr)
-    if <long>info_ptr == 0: # this is channel not found event
-        chan.found=-1
-        print('channel name not resolved by server: %s' % chan.name)
+    chan.rslv_stat = <long>info_ptr # resolve status passed through this pointer
 
-
-cdef void evproc_update_init(int uniq, void *privptr1, cda_dataref_t ref, int reason,
-                          void *info_ptr, void *privptr2) with gil:
-    cdef BaseChan chan = <BaseChan>(<event*>privptr2).objptr
-
-    chan.initialized = 1
-    chan.del_event(CDA_REF_EVMASK_UPDATE, <void*>evproc_update_init, <void*>chan, NULL)
+    if chan.rslv_stat == CDA_RSLVSTAT_NOTFOUND:
+        chan.rslv_str = 'not found'
+    elif chan.rslv_stat == CDA_RSLVSTAT_SEARCHING:
+        chan.rslv_str = 'searching'
+    elif chan.rslv_stat == CDA_RSLVSTAT_FOUND:
+        chan.rslv_str = 'found'
+    chan.resolve.emit(chan)
 
 
 cdef void evproc_update(int uniq, void *privptr1, cda_dataref_t ref, int reason,
@@ -67,18 +64,20 @@ cdef class BaseChan(CdaObject):
         size_t itemsize
         int64 time, prev_time
         int found # -1 - not found, 0 - unknown, 1 found
+        long rslv_stat
+        str rslv_str
         double quant
-        int registered, first_cycle, initialized
+        int registered, first_cycle
     cdef:
         void *context
 
     IF SIGNAL_IMPL=='sl':
         cdef readonly:
-            Signal valueMeasured, valueChanged, unresolved
+            Signal valueMeasured, valueChanged, resolve
     ELIF SIGNAL_IMPL=='Qt':
         cdef:
-            object c_valueChanged, c_valueMeasured, c_unresolved
-            public object valueChanged, valueMeasured, unresolved
+            object c_valueChanged, c_valueMeasured, c_resolve
+            public object valueChanged, valueMeasured, resolve
 
     def __init__(self, str name, object context=None, cxdtype_t dtype=CXDTYPE_DOUBLE, int max_nelems=1, **kwargs):
         CdaObject.__init__(self)
@@ -86,10 +85,10 @@ cdef class BaseChan(CdaObject):
         else: self.context = <void*>default_context
 
         IF SIGNAL_IMPL=='sl':
-            self.valueChanged, self.valueMeasured, self.unresolved = Signal(), Signal(), Signal()
+            self.valueChanged, self.valueMeasured, self.resolve = Signal(), Signal(), Signal()
         ELIF SIGNAL_IMPL=='Qt':
-            self.c_valueChanged, self.c_valueMeasured, self.c_unresolved = SignalContainer(), SignalContainer(), SignalContainer()
-            self.valueChanged, self.valueMeasured, self.unresolved = self.c_valueChanged.signal, self.c_valueMeasured.signal, self.c_unresolved.signal
+            self.c_valueChanged, self.c_valueMeasured, self.c_resolve = SignalContainer(), SignalContainer(), SignalContainer()
+            self.valueChanged, self.valueMeasured, self.resolve = self.c_valueChanged.signal, self.c_valueMeasured.signal, self.c_resolve.signal
 
         b_name = name.encode("ascii")
         cdef:
@@ -134,11 +133,9 @@ cdef class BaseChan(CdaObject):
 
         # initialization events (will be unregistered when get)
 
-        # this one makes "initialized" flag
-        # need to rewrite with function pointers replace
-        self.add_event(CDA_REF_EVMASK_UPDATE, <void*>evproc_update_init, <void*>self, NULL)
-
-        self.registered, self.first_cycle, self.initialized = True, True, False
+        self.registered, self.first_cycle = True, True
+        self.rslv_stat = CDA_RSLVSTAT_SEARCHING
+        self.rslv_str = 'searching'
 
     def __dealloc__(self):
         if self.registered:
