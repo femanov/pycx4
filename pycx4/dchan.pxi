@@ -11,8 +11,8 @@ cdef class DChan(BaseChan):
         # all general properties defined in base classes
         readonly double val, prev_val, tolerance
 
-    def __init__(self, str name, object context=None, **kwargs):
-        BaseChan.__init__(self, name, context, **kwargs)
+    def __init__(self, str name, **kwargs):
+        BaseChan.__init__(self, name, **kwargs)
         self.tolerance = 0.0
 
     cdef void cb(self):

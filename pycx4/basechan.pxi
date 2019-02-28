@@ -68,8 +68,7 @@ cdef class BaseChan(CdaObject):
         str rslv_str
         double quant
         int registered, first_cycle
-    cdef:
-        void *context
+        Context context
 
     IF SIGNAL_IMPL=='sl':
         cdef readonly:
@@ -79,10 +78,9 @@ cdef class BaseChan(CdaObject):
             object c_valueChanged, c_valueMeasured, c_resolve
             public object valueChanged, valueMeasured, resolve
 
-    def __init__(self, str name, object context=None, cxdtype_t dtype=CXDTYPE_DOUBLE, int max_nelems=1, **kwargs):
+    def __init__(self, str name, cxdtype_t dtype=CXDTYPE_DOUBLE, int max_nelems=1, **kwargs):
         CdaObject.__init__(self)
-        if isinstance(context, Context): self.context = <void*>context
-        else: self.context = <void*>default_context
+        self.context = kwargs.get('context', default_context)
 
         IF SIGNAL_IMPL=='sl':
             self.valueChanged, self.valueMeasured, self.resolve = Signal(), Signal(), Signal()
@@ -144,7 +142,7 @@ cdef class BaseChan(CdaObject):
             self.registered = 0
 
     def __str__(self):
-        return '<cda_channel: ref=%d, name=%s>' % (self.ref, self.name)
+        return '<cda_chan: ref=%d, name=%s>' % (self.ref, self.name)
 
     def short_name(self):
         a = self.name.split('.')

@@ -14,6 +14,25 @@ CXDTYPE_DOUBLE = cx.CXDTYPE_DOUBLE
 CXDTYPE_TEXT = cx.CXDTYPE_TEXT
 CXDTYPE_UCTEXT = cx.CXDTYPE_UCTEXT
 
+cx_dtype_map = {
+    'int8': CXDTYPE_INT8,
+    'int16': CXDTYPE_INT16,
+    'int32': CXDTYPE_INT32,
+    'int': CXDTYPE_INT32,
+    'int64': CXDTYPE_INT64,
+    'uint8': CXDTYPE_UINT8,
+    'uint16': CXDTYPE_UINT16,
+    'uint32': CXDTYPE_UINT32,
+    'uint': CXDTYPE_UINT32,
+    'uint64': CXDTYPE_UINT64,
+    'single': CXDTYPE_SINGLE,
+    'float': CXDTYPE_SINGLE,
+    'double': CXDTYPE_DOUBLE,
+    'text': CXDTYPE_TEXT,
+    'str': CXDTYPE_TEXT,
+    'uctext': CXDTYPE_UCTEXT,
+    #'unknown': CXDTYPE_UNKNOWN,
+}
 
 # function for pythonize cx-any-val
 # not to effective, but not a bottleneck

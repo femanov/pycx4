@@ -18,5 +18,6 @@ include 'ichan.pxi'
 include 'chan.pxi'
 include 'vchan.pxi'
 include 'strchan.pxi'
+include 'chan_factory.pxi'
 
 include 'cda_all.pxi'

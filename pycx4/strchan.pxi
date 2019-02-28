@@ -5,8 +5,8 @@ cdef class StrChan(BaseChan):
         char *cval
         int allocated
 
-    def __init__(self, str name, object context=None, int max_nelems=1024, **kwargs):
-        BaseChan.__init__(self, name, context, CXDTYPE_TEXT, max_nelems, **kwargs)
+    def __init__(self, str name, int max_nelems=1024, **kwargs):
+        BaseChan.__init__(self, name, CXDTYPE_TEXT, max_nelems, **kwargs)
         self.cval = <char*>malloc(max_nelems)
         if not self.cval: raise MemoryError()
         self.val,self.prev_val,self.allocated = '', '', 1
