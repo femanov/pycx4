@@ -26,7 +26,6 @@ cdef class PassGW:
 
     def out_c_proc(self, chan):
         if chan.val == self.last_val or self.last_val is None:
-            print('ignore after update')
             return
         self.out_chan.setValue(self.last_val)
 
