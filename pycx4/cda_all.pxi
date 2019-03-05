@@ -3,5 +3,4 @@ __all__ = ['Context', 'StrChan', 'DChan', 'IChan', 'Chan', 'VChan',
            'CXDTYPE_UINT32', 'CXDTYPE_UINT64', 'CXDTYPE_SINGLE', 'CXDTYPE_DOUBLE', 'CXDTYPE_TEXT', 'CXDTYPE_UCTEXT',
            'RSLVSTAT_NOTFOUND', 'RSLVSTAT_SEARCHING', 'RSLVSTAT_FOUND',
            'ChanFactory', 'cfactory',
-           'PassChan'
     ]
