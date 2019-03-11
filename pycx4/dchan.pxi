@@ -12,6 +12,7 @@ cdef class DChan(BaseChan):
         readonly double val, prev_val, tolerance
 
     def __init__(self, str name, **kwargs):
+        kwargs['dtype'] = cx.CXDTYPE_DOUBLE
         BaseChan.__init__(self, name, **kwargs)
         self.tolerance = 0.0
 

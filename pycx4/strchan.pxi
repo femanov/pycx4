@@ -3,17 +3,18 @@ cdef class StrChan(BaseChan):
     cdef:
         readonly str val, prev_val
         char *cval
-        int allocated
 
-    def __init__(self, str name, int max_nelems=1024, **kwargs):
-        BaseChan.__init__(self, name, CXDTYPE_TEXT, max_nelems, **kwargs)
-        self.cval = <char*>malloc(max_nelems)
+    def __init__(self, str name, **kwargs):
+        kwargs['dtype'] = cx.CXDTYPE_TEXT
+        BaseChan.__init__(self, name, **kwargs)
+        self.cval = <char*>malloc(self.max_nelems)
         if not self.cval: raise MemoryError()
-        self.val,self.prev_val,self.allocated = '', '', 1
+        self.val,self.prev_val = '', ''
 
     def __dealloc__(self):
-        if self.allocated:
+        if not self.cval:
             free(self.cval)
+            self.cval = NULL
 
     cdef void cb(self):
         self.prev_val = self.val

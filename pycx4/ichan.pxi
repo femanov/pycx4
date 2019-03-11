@@ -5,6 +5,7 @@ cdef class IChan(BaseChan):
         readonly int val, prev_val, tolerance
 
     def __init__(self, str name, **kwargs):
+        kwargs['dtype'] = cx.CXDTYPE_UINT32
         BaseChan.__init__(self, name, **kwargs)
         self.tolerance = 0
 

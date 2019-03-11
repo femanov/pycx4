@@ -78,9 +78,15 @@ cdef class BaseChan(CdaObject):
             object c_valueChanged, c_valueMeasured, c_resolve
             public object valueChanged, valueMeasured, resolve
 
-    def __init__(self, str name, cxdtype_t dtype=CXDTYPE_DOUBLE, int max_nelems=1, **kwargs):
+    def __init__(self, str name, **kwargs):
         CdaObject.__init__(self)
         self.context = kwargs.get('context', default_context)
+        self.max_nelems = kwargs.get('max_nelems', 1)
+        dtype = kwargs.get('dtype', cx.CXDTYPE_DOUBLE)
+        if type(dtype) == str:
+            self.dtype = cx_dtype_map[dtype]
+        else:
+            self.dtype = dtype
 
         IF SIGNAL_IMPL=='sl':
             self.valueChanged, self.valueMeasured, self.resolve = Signal(), Signal(), Signal()
@@ -116,11 +122,10 @@ cdef class BaseChan(CdaObject):
         if kwargs.get('debug', False):
             options += CDA_DATAREF_OPT_DEBUG
 
-        ret = cda_add_chan((<Context>self.context).cid, NULL, c_name, options, dtype, max_nelems,
+        ret = cda_add_chan((<Context>self.context).cid, NULL, c_name, options, self.dtype, self.max_nelems,
                            0, <cda_dataref_evproc_t>NULL, NULL)
         cda_check_exception(ret)
-        self.ref, self.name, self.dtype, self.max_nelems, self.itemsize =\
-            ret, name, dtype, max_nelems, cx.sizeof_cxdtype(dtype)
+        self.ref, self.name, self.itemsize = ret, name, cx.sizeof_cxdtype(dtype)
 
         (<Context>self.context).save_chan(<void*>self)
 
