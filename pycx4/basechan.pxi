@@ -158,6 +158,7 @@ cdef class BaseChan(CdaObject):
     cdef int get_data(self, size_t ofs, size_t size, void* buf):
         cdef int res = cda_get_ref_data(self.ref, ofs, size, buf)
         self.check_exception(res)
+        return res
 
     cdef int current_nelems(self):
         return cda_current_nelems_of_ref(self.ref)
