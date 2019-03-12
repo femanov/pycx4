@@ -18,14 +18,14 @@ cdef class DChan(BaseChan):
 
     cdef void cb(self):
         self.prev_val = self.val
-        cda_check_exception(cda_get_dcval(self.ref, &self.val))
+        self.check_exception(cda_get_dcval(self.ref, &self.val))
         if abs(self.val - self.prev_val) > self.tolerance or self.first_cycle:
             self.valueChanged.emit(self)
         self.valueMeasured.emit(self)
         self.first_cycle = False
 
     cpdef void setValue(self, double value):
-        cda_check_exception( cda_set_dcval(self.ref, value) )
+        self.check_exception( cda_set_dcval(self.ref, value) )
 
     cpdef void setTolerance(self, double new_tolerance):
         self.tolerance = new_tolerance

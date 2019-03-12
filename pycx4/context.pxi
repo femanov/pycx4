@@ -41,7 +41,7 @@ cdef class Context(CdaObject):
                 options += CDA_CONTEXT_OPT_IGN_UPDATE
 
         ret = cda_new_context(0, NULL, c_defpfx, options, NULL, 0, <cda_context_evproc_t>NULL, NULL)
-        cda_check_exception(ret)
+        self.check_exception(ret)
         self.cid, self.defpfx, self.chans, self.channum = ret, defpfx, NULL, 0
 
         IF SIGNAL_IMPL=='sl':
@@ -52,7 +52,7 @@ cdef class Context(CdaObject):
 
     def __dealloc__(self):
         if self.cid > 0:
-            cda_check_exception( cda_del_context(self.cid) )
+            self.check_exception( cda_del_context(self.cid) )
             self.cid = 0
         if self.channum > 0:
             free(self.chans)
@@ -92,7 +92,11 @@ cdef class Context(CdaObject):
                 return
 
     cdef void register_event(self, event *ev):
-        cda_check_exception( cda_add_context_evproc(self.cid, ev.evmask, <cda_context_evproc_t>ev.evproc, ev) )
+        self.check_exception( cda_add_context_evproc(self.cid, ev.evmask, <cda_context_evproc_t>ev.evproc, ev) )
 
     cdef void unregister_event(self, event *ev):
-        cda_check_exception( cda_del_context_evproc(self.cid, ev.evmask, <cda_context_evproc_t>ev.evproc, ev) )
+        self.check_exception( cda_del_context_evproc(self.cid, ev.evmask, <cda_context_evproc_t>ev.evproc, ev) )
+
+    cdef void check_exeptoin(self, int c_res):
+        if c_res < 0:
+            raise Exception("cda context error: cid=%s, %s, errcode=%s" % (self.cid, cda_last_err(), c_res ))

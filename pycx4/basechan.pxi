@@ -1,10 +1,4 @@
 
-# check for cda exception
-# this is not correct. Exception can be raised on python's side, not in C
-cdef inline int cda_check_exception(int code) except -1:
-    if code < 0:
-        raise Exception("cda error: %s, errcode: %s" % (cda_last_err(), code))
-    return 0
 
 # C callback function for ref's (channels)
 cdef void evproc_rslvstat(int uniq, void *privptr1, cda_dataref_t ref, int reason,
@@ -27,7 +21,7 @@ cdef void evproc_update(int uniq, void *privptr1, cda_dataref_t ref, int reason,
         cx_time_t timestr
         rflags_t rflags
         BaseChan chan = <BaseChan>(<event*>privptr2).objptr
-    cda_check_exception( cda_get_ref_stat(ref, &rflags, &timestr) )
+    chan.check_exception( cda_get_ref_stat(ref, &rflags, &timestr) )
 
     chan.prev_time = chan.time
     chan.time = <int64>timestr.sec * 1000000 + timestr.nsec / 1000
@@ -124,7 +118,7 @@ cdef class BaseChan(CdaObject):
 
         ret = cda_add_chan((<Context>self.context).cid, NULL, c_name, options, self.dtype, self.max_nelems,
                            0, <cda_dataref_evproc_t>NULL, NULL)
-        cda_check_exception(ret)
+        self.check_exception(ret)
         self.ref, self.name, self.itemsize = ret, name, cx.sizeof_cxdtype(dtype)
 
         (<Context>self.context).save_chan(<void*>self)
@@ -159,25 +153,26 @@ cdef class BaseChan(CdaObject):
 
     cdef int snd_data(self, cxdtype_t dtype, int nelems, void* data_p):
         cdef int res = cda_snd_ref_data(self.ref, dtype, nelems, data_p)
-        cda_check_exception(res)
-        return res
+        self.check_exception(res)
 
     cdef int get_data(self, size_t ofs, size_t size, void* buf):
         cdef int res = cda_get_ref_data(self.ref, ofs, size, buf)
-        cda_check_exception(res)
-        return res
+        self.check_exception(res)
 
     cdef int current_nelems(self):
         return cda_current_nelems_of_ref(self.ref)
 
     cdef void get_src(self, const char **src_p):
-        cda_check_exception( cda_src_of_ref(self.ref, src_p) )
+        self.check_exception( cda_src_of_ref(self.ref, src_p) )
 
     cdef void register_event(self, event *ev):
-        cda_check_exception( cda_add_dataref_evproc(self.ref, ev.evmask, <cda_dataref_evproc_t>ev.evproc, ev) )
+        self.check_exception( cda_add_dataref_evproc(self.ref, ev.evmask, <cda_dataref_evproc_t>ev.evproc, ev) )
 
     cdef void unregister_event(self, event *ev):
-        cda_check_exception( cda_del_dataref_evproc(self.ref, ev.evmask, <cda_dataref_evproc_t>ev.evproc, ev) )
+        self.check_exception( cda_del_dataref_evproc(self.ref, ev.evmask, <cda_dataref_evproc_t>ev.evproc, ev) )
 
+    cdef void check_exeptoin(self, int c_res):
+        if c_res < 0:
+            raise Exception("cda chan error: cname=%s, %s, errcode=%s" % (self.name, cda_last_err(), c_res ))
 
 

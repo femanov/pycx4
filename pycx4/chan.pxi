@@ -3,8 +3,8 @@ cdef class Chan(BaseChan):
     cdef:
         readonly object val, prev_val
 
-    def __init__(self, str name, cxdtype_t dtype=CXDTYPE_DOUBLE, **kwargs):
-        BaseChan.__init__(self, name, dtype, **kwargs)
+    def __init__(self, str name, **kwargs):
+        BaseChan.__init__(self, name, **kwargs)
 
     cdef void cb(self):
         cdef CxAnyVal_t aval
