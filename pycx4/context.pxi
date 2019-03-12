@@ -97,6 +97,6 @@ cdef class Context(CdaObject):
     cdef void unregister_event(self, event *ev):
         self.check_exception( cda_del_context_evproc(self.cid, ev.evmask, <cda_context_evproc_t>ev.evproc, ev) )
 
-    cdef void check_exeptoin(self, int c_res):
+    cdef void check_exception(self, int c_res):
         if c_res < 0:
             raise Exception("cda context error: cid=%s, %s, errcode=%s" % (self.cid, cda_last_err(), c_res ))

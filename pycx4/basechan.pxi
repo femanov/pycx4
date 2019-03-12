@@ -171,7 +171,7 @@ cdef class BaseChan(CdaObject):
     cdef void unregister_event(self, event *ev):
         self.check_exception( cda_del_dataref_evproc(self.ref, ev.evmask, <cda_dataref_evproc_t>ev.evproc, ev) )
 
-    cdef void check_exeptoin(self, int c_res):
+    cdef void check_exception(self, int c_res):
         if c_res < 0:
             raise Exception("cda chan error: cname=%s, %s, errcode=%s" % (self.name, cda_last_err(), c_res ))
 
