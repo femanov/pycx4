@@ -57,7 +57,6 @@ cdef class BaseChan(CdaObject):
         cxdtype_t dtype
         size_t itemsize
         int64 time, prev_time
-        int found # -1 - not found, 0 - unknown, 1 found
         long rslv_stat
         str rslv_str
         double quant
@@ -176,4 +175,8 @@ cdef class BaseChan(CdaObject):
         if c_res < 0:
             raise Exception("cda chan error: cname=%s, %s, errcode=%s" % (self.name, cda_last_err(), c_res ))
 
+    cpdef is_available(self):
+        if self.rslv_stat == CDA_RSLVSTAT_FOUND:
+            return True
+        return False
 
