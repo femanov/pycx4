@@ -14,7 +14,7 @@ cdef class DChan(BaseChan):
     def __init__(self, str name, **kwargs):
         kwargs['dtype'] = cx.CXDTYPE_DOUBLE
         BaseChan.__init__(self, name, **kwargs)
-        self.tolerance = 0.0
+        self.val, self.prev_val, self.tolerance = 0.0, 0.0, 0.0
 
     cdef void cb(self):
         self.prev_val = self.val

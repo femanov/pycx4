@@ -4,7 +4,7 @@ from .misc_types cimport uint8, uint32, int32, int64
 
 cdef extern from "cx.h" nogil:
     ctypedef uint32 rflags_t
-    ctypedef uint8  cxdtype_t
+    ctypedef uint32 cxdtype_t
 
     ctypedef int32  cx_ival_t
     ctypedef int64  cx_lval_t
