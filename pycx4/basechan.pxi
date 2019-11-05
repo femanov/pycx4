@@ -53,7 +53,6 @@ cdef class BaseChan(CdaObject):
     cdef readonly:
         cda_dataref_t ref
         str name
-        int u_id
         int max_nelems
         cxdtype_t dtype
         size_t itemsize
@@ -76,7 +75,6 @@ cdef class BaseChan(CdaObject):
         CdaObject.__init__(self)
         self.context = kwargs.get('context', default_context)
         self.max_nelems = kwargs.get('max_nelems', 1)
-        self.u_id = kwargs.get('u_id', 0)
         dtype = kwargs.get('dtype', cx.CXDTYPE_DOUBLE)
         if type(dtype) == str:
             self.dtype = cx_dtype_map[dtype]
