@@ -181,7 +181,7 @@ cdef class BaseChan(CdaObject):
             return True
         return False
 
-    cpdef rflags_strings(self):
+    cpdef rflags_text(self):
         return rflags_text(self.rflags)
 
     # TESTING functions, not yet fully implemented
