@@ -19,9 +19,8 @@ cdef void evproc_update(int uniq, void *privptr1, cda_dataref_t ref, int reason,
                         void *info_ptr, void *privptr2) with gil:
     cdef:
         cx_time_t timestr
-        rflags_t rflags
         BaseChan chan = <BaseChan>(<event*>privptr2).objptr
-    chan.check_exception( cda_get_ref_stat(ref, &rflags, &timestr) )
+    chan.check_exception( cda_get_ref_stat(ref, &chan.rflags, &timestr) )
 
     chan.prev_time = chan.time
     chan.time = <int64>timestr.sec * 1000000 + timestr.nsec / 1000
@@ -181,6 +180,10 @@ cdef class BaseChan(CdaObject):
             return True
         return False
 
+    cpdef rflags_strings(self):
+        return rflags_text(self.rflags)
+
+    # TESTING functions, not yet fully implemented
     cpdef get_range(self):
         cdef CxAnyVal_t r[2]
         cdef cxdtype_t dt
