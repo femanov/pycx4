@@ -46,6 +46,7 @@ cdef void quant_update(int uniq, void *privptr1, cda_dataref_t ref, int reason,
         res = cda_rd_convert(ref, 0, &shift)
         res = cda_rd_convert(ref, quant_draw, &val)
         chan.quant = val - shift
+        print(chan.name, chan.quant)
 
 
 # wrapper-class for low-level functions and channel registration
@@ -180,3 +181,43 @@ cdef class BaseChan(CdaObject):
             return True
         return False
 
+    cpdef get_range(self):
+        cdef CxAnyVal_t r[2]
+        cdef cxdtype_t dt
+        c_res = cda_range_of_ref(self.ref, r, &dt)
+        print(c_res, dt, aval_value(&(r[0]), dt), aval_value(&(r[1]), dt))
+        print(CXDTYPE_UNKNOWN)
+
+    cpdef get_strings(self):
+        cdef char *ident = NULL
+        cdef char *label = NULL
+        cdef char *tip = NULL
+        cdef char *comment = NULL
+        cdef char *geoinfo = NULL
+        cdef char *rsrvd6 = NULL
+        cdef char *units = NULL
+        cdef char *dpyfmt = NULL
+        print("before get")
+        c_res = cda_strings_of_ref(self.ref, &ident, &label, &tip, &comment, &geoinfo,
+                                   &rsrvd6, &units, &dpyfmt)
+        print("after get")
+        if ident != NULL:
+            print("ident")
+        if label != NULL:
+            print("label")
+        if tip != NULL:
+            print("tip")
+        if comment != NULL:
+            print("comment")
+        if geoinfo != NULL:
+            print("geoinfo")
+        if rsrvd6 != NULL:
+            print("rsrvd6")
+        if units != NULL:
+            print("units")
+        if dpyfmt != NULL:
+            print("dpyfmt")
+
+        # print(<bytes>ident, <bytes>label, <bytes>tip, <bytes>comment,
+        #       <bytes>geoinfo, <bytes>rsrvd6, <bytes>units, <bytes>dpyfmt)
+        print("after print")

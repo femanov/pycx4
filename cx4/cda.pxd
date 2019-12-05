@@ -6,7 +6,7 @@ from .cx_common_types cimport *
 from .cx cimport cxdtype_t, cx_time_t, rflags_t
 
 
-cdef extern from "cda.h" nogil:
+cdef extern from "cda.h":
     enum:
         CDA_PATH_MAX
 
@@ -67,24 +67,27 @@ cdef extern from "cda.h" nogil:
 
     # ref events
     enum:
-       CDA_REF_R_UPDATE
-       CDA_REF_EVMASK_UPDATE
-       CDA_REF_R_STATCHG
-       CDA_REF_EVMASK_STATCHG
-       CDA_REF_R_STRSCHG
-       CDA_REF_EVMASK_STRSCHG
-       CDA_REF_R_RDSCHG
-       CDA_REF_EVMASK_RDSCHG
-       CDA_REF_R_FRESHCHG
-       CDA_REF_EVMASK_FRESHCHG
-       CDA_REF_R_QUANTCHG
-       CDA_REF_EVMASK_QUANTCHG
-       CDA_REF_R_RSLVSTAT
-       CDA_REF_EVMASK_RSLVSTAT
-       CDA_REF_R_CURVAL
-       CDA_REF_EVMASK_CURVAL
-       CDA_REF_R_LOCKSTAT
-       CDA_REF_EVMASK_LOCKSTAT
+        CDA_REF_R_UPDATE
+        CDA_REF_R_STATCHG
+        CDA_REF_R_STRSCHG
+        CDA_REF_R_RDSCHG
+        CDA_REF_R_FRESHCHG
+        CDA_REF_R_QUANTCHG
+        CDA_REF_R_RANGECHG
+        CDA_REF_R_RSLVSTAT
+        CDA_REF_R_CURVAL
+        CDA_REF_R_LOCKSTAT
+
+        CDA_REF_EVMASK_UPDATE
+        CDA_REF_EVMASK_STATCHG
+        CDA_REF_EVMASK_STRSCHG
+        CDA_REF_EVMASK_RDSCHG
+        CDA_REF_EVMASK_FRESHCHG
+        CDA_REF_EVMASK_QUANTCHG
+        CDA_REF_EVMASK_RANGECHG
+        CDA_REF_EVMASK_RSLVSTAT
+        CDA_REF_EVMASK_CURVAL
+        CDA_REF_EVMASK_LOCKSTAT
 
     enum:
         CDA_LOCK_RLS
@@ -193,6 +196,7 @@ cdef extern from "cda.h" nogil:
     int cda_current_nelems_of_ref(cda_dataref_t ref)
     int cda_fresh_age_of_ref     (cda_dataref_t ref, cx_time_t *fresh_age_p)
     int cda_quant_of_ref         (cda_dataref_t ref, CxAnyVal_t *q_p, cxdtype_t *q_dtype_p)
+    int cda_range_of_ref         (cda_dataref_t ref, CxAnyVal_t range[], cxdtype_t *range_dtype_p);
     int cda_current_dtype_of_ref (cda_dataref_t ref)
 
     int cda_strings_of_ref       (cda_dataref_t  ref,
