@@ -62,6 +62,7 @@ cdef class BaseChan(CdaObject):
         double quant
         int registered, first_cycle
         Context context
+        rflags_t rflags
 
     IF SIGNAL_IMPL=='sl':
         cdef readonly:
