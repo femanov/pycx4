@@ -6,3 +6,7 @@ class SignalContainer(QObject):
 
     def __init__(self):
         super(SignalContainer, self).__init__()
+        # next lines is possible after initialization
+        self.connect = self.signal.connect
+        self.disconnect = self.signal.disconnect
+        self.emit = self.signal.emit

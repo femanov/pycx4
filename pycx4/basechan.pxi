@@ -47,22 +47,29 @@ cdef void quant_update(int uniq, void *privptr1, cda_dataref_t ref, int reason,
         chan.quant = val - shift
         print(chan.name, chan.quant)
 
+cdef void range_update(int uniq, void *privptr1, cda_dataref_t ref, int reason,
+                        void *info_ptr, void *privptr2) with gil:
+    cdef:
+        BaseChan chan = <BaseChan>(<event*>privptr2).objptr
+    chan.get_range()
+
 
 # wrapper-class for low-level functions and channel registration
 cdef class BaseChan(CdaObject):
     cdef readonly:
-        cda_dataref_t ref
-        str name
-        int max_nelems
-        cxdtype_t dtype
-        size_t itemsize
-        int64 time, prev_time
-        long rslv_stat
-        str rslv_str
+        cda_dataref_t ref      # chan id
+        str name               # chan name
+        int max_nelems         # max number of elements when registered
+        cxdtype_t dtype        # data type
+        size_t itemsize        # item size in bytes
+        int64 time, prev_time  # last and prev data update time
+        long rslv_stat         # resolving status
+        str rslv_str           # resolving string
         double quant
         int registered, first_cycle
         Context context
-        rflags_t rflags
+        rflags_t rflags        # flags
+        list rng               # ranges
 
     IF SIGNAL_IMPL=='sl':
         cdef readonly:
@@ -85,8 +92,7 @@ cdef class BaseChan(CdaObject):
         IF SIGNAL_IMPL=='sl':
             self.valueChanged, self.valueMeasured, self.resolve = Signal(), Signal(), Signal()
         ELIF SIGNAL_IMPL=='Qt':
-            self.c_valueChanged, self.c_valueMeasured, self.c_resolve = SignalContainer(), SignalContainer(), SignalContainer()
-            self.valueChanged, self.valueMeasured, self.resolve = self.c_valueChanged.signal, self.c_valueMeasured.signal, self.c_resolve.signal
+            self.valueChanged, self.valueMeasured, self.resolve = SignalContainer(), SignalContainer(), SignalContainer()
 
         b_name = name.encode("ascii")
         cdef:
@@ -125,14 +131,29 @@ cdef class BaseChan(CdaObject):
 
         # events which can be regular
         self.add_event(CDA_REF_EVMASK_RSLVSTAT, <void*>evproc_rslvstat, <void*>self, NULL)
-        self.add_event(CDA_REF_EVMASK_QUANTCHG, <void*>quant_update, <void*>self, NULL)
         self.add_event(CDA_REF_EVMASK_UPDATE, <void*>evproc_update, <void*>self, NULL)
+
+        self.add_event(CDA_REF_EVMASK_QUANTCHG, <void*>quant_update, <void*>self, NULL)
+        self.add_event(CDA_REF_EVMASK_RANGECHG, <void*>range_update, <void*>self, NULL)
+
+
+        ## CDA_REF_EVMASK_UPDATE
+        # CDA_REF_EVMASK_STATCHG
+        # CDA_REF_EVMASK_STRSCHG
+        # CDA_REF_EVMASK_RDSCHG
+        # CDA_REF_EVMASK_FRESHCHG
+        ## CDA_REF_EVMASK_QUANTCHG
+        # CDA_REF_EVMASK_RANGECHG
+        # CDA_REF_EVMASK_RSLVSTAT
+        # CDA_REF_EVMASK_CURVAL
+        # CDA_REF_EVMASK_LOCKSTAT
 
         # initialization events (will be unregistered when get)
 
         self.registered, self.first_cycle = True, True
         self.rslv_stat = CDA_RSLVSTAT_SEARCHING
         self.rslv_str = 'searching'
+        self.rng = []
 
     def __dealloc__(self):
         if self.registered:
@@ -189,8 +210,10 @@ cdef class BaseChan(CdaObject):
         cdef CxAnyVal_t r[2]
         cdef cxdtype_t dt
         c_res = cda_range_of_ref(self.ref, r, &dt)
-        print(c_res, dt, aval_value(&(r[0]), dt), aval_value(&(r[1]), dt))
-        print(CXDTYPE_UNKNOWN)
+        if dt == CXDTYPE_UNKNOWN:
+            self.rng = []
+        else:
+            self.rng = [aval_value(&(r[0]), dt), aval_value(&(r[1]), dt)]
 
     cpdef get_strings(self):
         cdef char *ident = NULL
