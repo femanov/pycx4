@@ -23,7 +23,7 @@ cdef class Context(CdaObject):
             public object serverCycle
 
     def __init__(self, defpfx="cx::", **kwargs):
-        super(Context, self).__init__()
+        super().__init__()
         cdef:
             int ret
             int options = 0

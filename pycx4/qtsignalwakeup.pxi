@@ -5,7 +5,7 @@ cdef class SignalWakeupHandler(QAbstractSocket):
     signalReceived = QtCore.pyqtSignal(int)
 
     def __init__(self, parent=None):
-        super(SignalWakeupHandler, self).__init__(QAbstractSocket.UdpSocket, parent)
+        super().__init__(QAbstractSocket.UdpSocket, parent)
         self.old_fd = None
         # Create a socket pair
         self.wsock, self.rsock = socket.socketpair(type=socket.SOCK_DGRAM)
