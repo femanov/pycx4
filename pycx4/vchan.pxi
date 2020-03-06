@@ -5,17 +5,26 @@ cdef class VChan(BaseChan):
     cdef:
         readonly np.ndarray val, buf_val
         readonly object npdtype
+        readonly int nelems
+        int change_sign
 
     def __init__(self, str name, **kwargs):
         BaseChan.__init__(self, name, **kwargs)
+        self.change_sign = kwargs.get('change_sign', False)
         self.npdtype = cxdtype2np(self.dtype)
-        self.buf_val = np.zeros(self.max_nelems, self.npdtype, order='C')
         self.val = np.zeros(0, self.npdtype, order='C')
+        self.nelems = 0
 
     cdef void cb(self):
-        c_len = self.get_data(0, self.itemsize * self.max_nelems, <void*>self.buf_val.data)
+        nelems = self.current_nelems()
+        if self.nelems != nelems:
+            self.nelems = nelems
+            self.val.resize(nelems)
+        c_len = self.get_data(0, self.itemsize * nelems, <void*>self.val.data)
         nelems_read = int(c_len/self.itemsize)
-        self.val = self.buf_val[:nelems_read]
+        if self.change_sign:
+            self.val *= -1
+
         self.valueMeasured.emit(self)
         self.valueChanged.emit(self)
 
