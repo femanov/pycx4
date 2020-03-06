@@ -10,7 +10,7 @@ subprocess.run(['twine', 'upload', 'dist/pycx4-' + __version__ + '.tar.gz'])
 
 tags = [get_abbr_impl() + get_impl_ver(),
          get_abi_tag(),
-         get_platform(None)]
+         get_platform()]
 
 stag = '-'.join(tags)
 
