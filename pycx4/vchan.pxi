@@ -3,7 +3,7 @@ np.import_array()
 # vector-data channel class
 cdef class VChan(BaseChan):
     cdef:
-        readonly np.ndarray val, buf_val
+        readonly np.ndarray val
         readonly object npdtype
         readonly int nelems
         int change_sign
@@ -12,8 +12,8 @@ cdef class VChan(BaseChan):
         BaseChan.__init__(self, name, **kwargs)
         self.change_sign = kwargs.get('change_sign', False)
         self.npdtype = cxdtype2np(self.dtype)
-        self.val = np.zeros(0, self.npdtype, order='C')
-        self.nelems = 0
+        self.val = np.zeros(1, self.npdtype, order='C')
+        self.nelems = 1
 
     cdef void cb(self):
         nelems = self.current_nelems()

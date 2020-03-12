@@ -93,7 +93,6 @@ cdef class BaseChan(CdaObject):
             self.valueChanged, self.valueMeasured, self.resolve = Signal(), Signal(), Signal()
         ELIF SIGNAL_IMPL=='Qt':
             self.valueChanged, self.valueMeasured, self.resolve = SignalContainer(), SignalContainer(), SignalContainer()
-
         b_name = name.encode("ascii")
         cdef:
             char *c_name = b_name
@@ -135,7 +134,6 @@ cdef class BaseChan(CdaObject):
 
         self.add_event(CDA_REF_EVMASK_QUANTCHG, <void*>quant_update, <void*>self, NULL)
         self.add_event(CDA_REF_EVMASK_RANGECHG, <void*>range_update, <void*>self, NULL)
-
 
         ## CDA_REF_EVMASK_UPDATE
         # CDA_REF_EVMASK_STATCHG
