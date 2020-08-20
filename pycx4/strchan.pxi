@@ -5,7 +5,7 @@ cdef class StrChan(BaseChan):
         char *cval
 
     def __init__(self, str name, **kwargs):
-        kwargs['dtype'] = cx.CXDTYPE_TEXT
+        kwargs['dtype'] = CXDTYPE_TEXT
         BaseChan.__init__(self, name, **kwargs)
         self.cval = <char*>malloc(self.max_nelems)
         if not self.cval: raise MemoryError()

@@ -1,18 +1,43 @@
 
-from .misc_types cimport uint8, uint32, int32, int64
+from .misc_types cimport *
 
 
 cdef extern from "cx.h" nogil:
+    enum:
+        CX_MAX_SERVER
+
+    enum:
+        CX_NULL_CHANID
+
+    ctypedef int32  cxid_t
     ctypedef uint32 rflags_t
     ctypedef uint32 cxdtype_t
 
-    ctypedef int32  cx_ival_t
-    ctypedef int64  cx_lval_t
-    ctypedef double cx_dval_t
+    #ctypedef int32  cx_ival_t
+    #ctypedef int64  cx_lval_t
+    #ctypedef double cx_dval_t
 
     ctypedef struct cx_time_t:
         int sec
         int nsec
+
+    enum:
+        __UNUSED__CX_TIME_SEC_TRUSTED
+        CX_TIME_SEC_NEVER_READ
+
+    ctypedef union CxAnyVal_t:
+        float64  f64
+        float32  f32
+        int64    i64
+        uint64   u64
+        uint32   u32
+        int32    i32
+        int16    i16
+        uint16   u16
+        int8     i8
+        uint8    u8
+        char8    c8
+        char32   c32
 
 
     enum:
@@ -107,3 +132,5 @@ cdef extern from "cx.h" nogil:
         CX_LOCK_RD
         CX_LOCK_WR
         CX_LOCK_ALLORNOTHING
+        CX_LOCK_WRITE_SET
+        CX_LOCK_WRITE_RLS

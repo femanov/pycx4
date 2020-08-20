@@ -3,7 +3,7 @@
 
 from .misc_types cimport *
 from .cx_common_types cimport *
-from .cx cimport cxdtype_t, cx_time_t, rflags_t
+from .cx cimport *
 
 
 cdef extern from "cda.h":
@@ -37,7 +37,11 @@ cdef extern from "cda.h":
         CDA_DATAREF_OPT_ON_UPDATE
         CDA_DATAREF_OPT_rsrvd26
         CDA_DATAREF_OPT_NO_WR_WAIT
+        CDA_DATAREF_OPT_rsrvd24
         CDA_DATAREF_OPT_DEBUG
+        CDA_DATAREF_OPT_PRIV_SRV
+        CDA_DATAREF_OPT_EXCLUSIVE
+        CDA_DATAREF_OPT_NOMONITOR
 
     enum:
         CDA_OPT_NONE
@@ -156,8 +160,7 @@ cdef extern from "cda.h":
                                       cda_dataref_evproc_t  evproc,
                                       void                 *privptr2)
 
-    int            cda_lock_chans(int count, cda_dataref_t *refs,
-                               int operation)
+    int cda_lock_chans(int count, cda_dataref_t *refs, int operation)
 
     char *cda_combine_base_and_spec(cda_context_t     cid,
                                 const char           *base,
@@ -174,6 +177,10 @@ cdef extern from "cda.h":
     cda_dataref_t cda_add_ichan(cda_context_t cid, const char *name)
     int cda_get_icval(cda_dataref_t ref, int *v_p)
     int cda_set_icval(cda_dataref_t ref, int val)
+
+    int cda_add_schan(cda_context_t cid, const char *name, size_t maxlen)
+    int cda_get_scval(cda_dataref_t ref, char *buf, size_t bufsize, size_t *len_p)
+    int cda_set_scval(cda_dataref_t ref, char *str, size_t len)
 
     # Formulae management
     cda_dataref_t cda_add_formula(cda_context_t         cid,
@@ -219,7 +226,7 @@ cdef extern from "cda.h":
                                   int       *srv_hwid_p,
                                   int       *cln_hwr_p)
 
-
+    int cda_lock_stat_of_ref(cda_dataref_t ref)
     int cda_status_of_ref_sid(cda_dataref_t ref)
 
     int cda_status_srvs_count(cda_context_t  cid)
@@ -228,6 +235,7 @@ cdef extern from "cda.h":
     const char *cda_status_srv_name(cda_context_t cid, int nth)
 
     int cda_srvs_of_ref(cda_dataref_t ref, uint8 *conns_u, int conns_u_size)
+    int cda_reconnect_srv(cda_context_t cid, int nth)
     int cda_add_server_conn(cda_context_t cid, const char *srvref)
 
     #/**********************/
@@ -245,6 +253,7 @@ cdef extern from "cda.h":
 
 
     int cda_rd_convert  (cda_dataref_t ref, double raw, double *result_p)
+    int cda_r_convert   (cda_dataref_t ref, double raw, double *result_p)
     int cda_snd_ref_data(cda_dataref_t ref, cxdtype_t dtype, int nelems, void *data)
     int cda_get_ref_data(cda_dataref_t ref, size_t ofs, size_t size, void *buf)
     int cda_get_ref_stat(cda_dataref_t ref, rflags_t *rflags_p, cx_time_t *timestamp_p)
@@ -252,10 +261,10 @@ cdef extern from "cda.h":
 
     int cda_stop_formula(cda_dataref_t ref)
 
+    void cda_allow_plugins_loading(int allow)
+
 
     const char *cda_strserverstatus_short(cda_serverstatus_t status)
     char *cda_last_err()
 
     void cda_do_cleanup(int uniq)
-
-

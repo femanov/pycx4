@@ -83,7 +83,7 @@ cdef class BaseChan(CdaObject):
         CdaObject.__init__(self)
         self.context = kwargs.get('context', default_context)
         self.max_nelems = kwargs.get('max_nelems', 1)
-        dtype = kwargs.get('dtype', cx.CXDTYPE_DOUBLE)
+        dtype = kwargs.get('dtype', CXDTYPE_DOUBLE)
         if type(dtype) == str:
             self.dtype = cx_dtype_map[dtype]
         else:
@@ -124,7 +124,7 @@ cdef class BaseChan(CdaObject):
         ret = cda_add_chan((<Context>self.context).cid, NULL, c_name, options, self.dtype, self.max_nelems,
                            0, <cda_dataref_evproc_t>NULL, NULL)
         self.check_exception(ret)
-        self.ref, self.name, self.itemsize = ret, name, cx.sizeof_cxdtype(dtype)
+        self.ref, self.name, self.itemsize = ret, name, sizeof_cxdtype(dtype)
 
         (<Context>self.context).save_chan(<void*>self)
 
@@ -246,3 +246,7 @@ cdef class BaseChan(CdaObject):
         # print(<bytes>ident, <bytes>label, <bytes>tip, <bytes>comment,
         #       <bytes>geoinfo, <bytes>rsrvd6, <bytes>units, <bytes>dpyfmt)
         print("after print")
+
+    cdef lock(self):
+        pass
+        #res = cda_lock_chans(1, &(self.ref), CX_LOCK_WRITE_SET)
