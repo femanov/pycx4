@@ -53,6 +53,12 @@ cdef void range_update(int uniq, void *privptr1, cda_dataref_t ref, int reason,
         BaseChan chan = <BaseChan>(<event*>privptr2).objptr
     chan.get_range()
 
+cdef void strs_update(int uniq, void *privptr1, cda_dataref_t ref, int reason,
+                        void *info_ptr, void *privptr2) with gil:
+    cdef:
+        BaseChan chan = <BaseChan>(<event*>privptr2).objptr
+    chan.get_strings()
+
 
 # wrapper-class for low-level functions and channel registration
 cdef class BaseChan(CdaObject):
@@ -135,6 +141,7 @@ cdef class BaseChan(CdaObject):
         self.add_event(CDA_REF_EVMASK_QUANTCHG, <void*>quant_update, <void*>self, NULL)
         self.add_event(CDA_REF_EVMASK_RANGECHG, <void*>range_update, <void*>self, NULL)
 
+        self.add_event(CDA_REF_EVMASK_STRSCHG, <void*>strs_update, <void*>self, NULL)
         ## CDA_REF_EVMASK_UPDATE
         # CDA_REF_EVMASK_STATCHG
         # CDA_REF_EVMASK_STRSCHG
