@@ -17,11 +17,16 @@ cdef class Signal:
             Py_DECREF(<object>(self.callbacks[ind]))
         free(self.callbacks)
 
-    cpdef connect(self, callback):
+    cpdef connect(self, slot):
         cdef:
             void *tmp
             int ind
-        if not callable(callback): raise Exception('A function was expected')
+        if isinstance(slot, Signal):
+            callback = slot.emit
+        elif callable(slot):
+            callback = slot
+        else:
+            raise Exception('A function was expected')
         for ind in range(self.cnum):
             if callback == <object>self.callbacks[ind]:
                 return

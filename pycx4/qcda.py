@@ -28,11 +28,10 @@ if QT_LIB == 'PyQt5':
     __all__ += pycx4.q5cda.__all__
     # get q5cda to qcda namespace
     from pycx4.q5cda import *
-
-
 elif QT_LIB == 'PyQt4':
     import pycx4.q4cda
     __all__ += pycx4.q4cda.__all__
     # get q5cda to qcda namespace
     from pycx4.q4cda import *
-
+else:
+    ImportError("something wrong")

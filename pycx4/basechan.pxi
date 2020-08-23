@@ -60,6 +60,13 @@ cdef void strs_update(int uniq, void *privptr1, cda_dataref_t ref, int reason,
     chan.get_strings()
 
 
+cdef void lockstat_update(int uniq, void *privptr1, cda_dataref_t ref, int reason,
+                        void *info_ptr, void *privptr2) with gil:
+    cdef:
+        BaseChan chan = <BaseChan>(<event*>privptr2).objptr
+    chan.get_lockstate()
+
+
 # wrapper-class for low-level functions and channel registration
 cdef class BaseChan(CdaObject):
     cdef readonly:
@@ -76,14 +83,23 @@ cdef class BaseChan(CdaObject):
         Context context
         rflags_t rflags        # flags
         list rng               # ranges
-
-    IF SIGNAL_IMPL=='sl':
-        cdef readonly:
-            Signal valueMeasured, valueChanged, resolve
-    ELIF SIGNAL_IMPL=='Qt':
-        cdef:
-            object c_valueChanged, c_valueMeasured, c_resolve
-            public object valueChanged, valueMeasured, resolve
+        # strings of ref
+        char *ident
+        char *label
+        char *tip
+        char *comment
+        char *geoinfo
+        char *rsrvd6
+        char *units
+        char *dpyfmt
+    cdef public:
+        object valueMeasured, valueChanged, resolve
+    # IF SIGNAL_IMPL=='sl':
+    #     cdef readonly:
+    #         Signal valueMeasured, valueChanged, resolve
+    # ELIF SIGNAL_IMPL=='Qt':
+    #     cdef:
+    #         public object valueChanged, valueMeasured, resolve
 
     def __init__(self, str name, **kwargs):
         CdaObject.__init__(self)
@@ -95,10 +111,12 @@ cdef class BaseChan(CdaObject):
         else:
             self.dtype = dtype
 
-        IF SIGNAL_IMPL=='sl':
-            self.valueChanged, self.valueMeasured, self.resolve = Signal(), Signal(), Signal()
-        ELIF SIGNAL_IMPL=='Qt':
-            self.valueChanged, self.valueMeasured, self.resolve = SignalContainer(), SignalContainer(), SignalContainer()
+        self.valueChanged, self.valueMeasured, self.resolve = Signal(), Signal(), Signal()
+        # IF SIGNAL_IMPL=='sl':
+        #     self.valueChanged, self.valueMeasured, self.resolve = Signal(), Signal(), Signal()
+        # ELIF SIGNAL_IMPL=='Qt':
+        #     self.valueChanged, self.valueMeasured, self.resolve = SignalContainer(), SignalContainer(), SignalContainer()
+
         b_name = name.encode("ascii")
         cdef:
             char *c_name = b_name
@@ -142,14 +160,20 @@ cdef class BaseChan(CdaObject):
         self.add_event(CDA_REF_EVMASK_RANGECHG, <void*>range_update, <void*>self, NULL)
 
         self.add_event(CDA_REF_EVMASK_STRSCHG, <void*>strs_update, <void*>self, NULL)
+
+        self.add_event(CDA_REF_EVMASK_LOCKSTAT, <void*>lockstat_update, <void*>self, NULL)
+
+        # TODO: need to allow user to select registered events
+
+        ## <-- have some implementation
         ## CDA_REF_EVMASK_UPDATE
         # CDA_REF_EVMASK_STATCHG
         # CDA_REF_EVMASK_STRSCHG
         # CDA_REF_EVMASK_RDSCHG
         # CDA_REF_EVMASK_FRESHCHG
         ## CDA_REF_EVMASK_QUANTCHG
-        # CDA_REF_EVMASK_RANGECHG
-        # CDA_REF_EVMASK_RSLVSTAT
+        ## CDA_REF_EVMASK_RANGECHG
+        ## CDA_REF_EVMASK_RSLVSTAT
         # CDA_REF_EVMASK_CURVAL
         # CDA_REF_EVMASK_LOCKSTAT
 
@@ -221,39 +245,24 @@ cdef class BaseChan(CdaObject):
             self.rng = [aval_value(&(r[0]), dt), aval_value(&(r[1]), dt)]
 
     cpdef get_strings(self):
-        cdef char *ident = NULL
-        cdef char *label = NULL
-        cdef char *tip = NULL
-        cdef char *comment = NULL
-        cdef char *geoinfo = NULL
-        cdef char *rsrvd6 = NULL
-        cdef char *units = NULL
-        cdef char *dpyfmt = NULL
-        print("before get")
-        c_res = cda_strings_of_ref(self.ref, &ident, &label, &tip, &comment, &geoinfo,
-                                   &rsrvd6, &units, &dpyfmt)
-        print("after get")
-        if ident != NULL:
-            print("ident")
-        if label != NULL:
-            print("label")
-        if tip != NULL:
-            print("tip")
-        if comment != NULL:
-            print("comment")
-        if geoinfo != NULL:
-            print("geoinfo")
-        if rsrvd6 != NULL:
-            print("rsrvd6")
-        if units != NULL:
-            print("units")
-        if dpyfmt != NULL:
-            print("dpyfmt")
+        c_res = cda_strings_of_ref(self.ref, &self.ident, &self.label, &self.tip, &self.comment,
+                                   &self.geoinfo, &self.rsrvd6, &self.units, &self.dpyfmt)
+        print("string update")
+        if self.ident != NULL: print("ident=", self.ident)
+        if self.label != NULL: print("label=", self.label)
+        if self.tip != NULL: print("tip=", self.tip)
+        if self.comment != NULL: print("comment=", self.comment)
+        if self.geoinfo != NULL: print("geoinfo=", self.geoinfo)
+        if self.rsrvd6 != NULL: print("rsrvd6=", self.rsrvd6)
+        if self.units != NULL: print("units=", self.units)
+        if self.dpyfmt != NULL: print("dpyfmt=", self.dpyfmt)
 
         # print(<bytes>ident, <bytes>label, <bytes>tip, <bytes>comment,
         #       <bytes>geoinfo, <bytes>rsrvd6, <bytes>units, <bytes>dpyfmt)
-        print("after print")
 
-    cdef lock(self):
+    cpdef get_lockstate(self):
+        pass
+
+    cpdef lock(self):
         pass
         #res = cda_lock_chans(1, &(self.ref), CX_LOCK_WRITE_SET)
