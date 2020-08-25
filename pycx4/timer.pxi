@@ -9,7 +9,6 @@ cdef void sltimer_proc(int uniq, void *privptr1, sl_tid_t tid, void *privptr2) w
     t.timeout.emit(t)
 
 
-
 cdef class Timer:
     cdef readonly:
         int usec

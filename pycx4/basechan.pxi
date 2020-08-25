@@ -94,12 +94,6 @@ cdef class BaseChan(CdaObject):
         char *dpyfmt
     cdef public:
         object valueMeasured, valueChanged, resolve
-    # IF SIGNAL_IMPL=='sl':
-    #     cdef readonly:
-    #         Signal valueMeasured, valueChanged, resolve
-    # ELIF SIGNAL_IMPL=='Qt':
-    #     cdef:
-    #         public object valueChanged, valueMeasured, resolve
 
     def __init__(self, str name, **kwargs):
         CdaObject.__init__(self)
@@ -111,11 +105,7 @@ cdef class BaseChan(CdaObject):
         else:
             self.dtype = dtype
 
-        self.valueChanged, self.valueMeasured, self.resolve = Signal(), Signal(), Signal()
-        # IF SIGNAL_IMPL=='sl':
-        #     self.valueChanged, self.valueMeasured, self.resolve = Signal(), Signal(), Signal()
-        # ELIF SIGNAL_IMPL=='Qt':
-        #     self.valueChanged, self.valueMeasured, self.resolve = SignalContainer(), SignalContainer(), SignalContainer()
+        self.valueChanged, self.valueMeasured, self.resolve = Signal(object), Signal(object), Signal(object)
 
         b_name = name.encode("ascii")
         cdef:
@@ -257,10 +247,8 @@ cdef class BaseChan(CdaObject):
         if self.units != NULL: print("units=", self.units)
         if self.dpyfmt != NULL: print("dpyfmt=", self.dpyfmt)
 
-        # print(<bytes>ident, <bytes>label, <bytes>tip, <bytes>comment,
-        #       <bytes>geoinfo, <bytes>rsrvd6, <bytes>units, <bytes>dpyfmt)
-
     cpdef get_lockstate(self):
+        print("updating lock state")
         pass
 
     cpdef lock(self):

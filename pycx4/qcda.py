@@ -35,3 +35,4 @@ elif QT_LIB == 'PyQt4':
     from pycx4.q4cda import *
 else:
     ImportError("something wrong")
+

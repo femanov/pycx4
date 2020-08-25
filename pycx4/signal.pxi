@@ -7,7 +7,7 @@ cdef class Signal:
         int cnum
 
 # let's rely on default definitions, ha-ha. if any problems - will change it
-    def __cinit__(self):
+    def __cinit__(self, *args):
         self.callbacks = NULL
         self.cnum = 0
 
@@ -53,7 +53,7 @@ cdef class Signal:
                 self.cnum -= 1
         Py_DECREF(callback)
 
-    cpdef emit(self, object arg) with gil:
+    def emit(self, *args):
         cdef int ind
         for ind in range(self.cnum):
-            (<object>(self.callbacks[ind]))(arg)
+            (<object>(self.callbacks[ind]))(*args)

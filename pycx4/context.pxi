@@ -10,17 +10,11 @@ cdef class Context(CdaObject):
     cdef readonly:
         cda_context_t cid
         str defpfx
-
+    cdef public:
+        object serverCycle
     cdef:
         void **chans
         int channum
-    IF SIGNAL_IMPL=='sl':
-        cdef readonly:
-            Signal serverCycle
-    ELIF SIGNAL_IMPL=='Qt':
-        cdef:
-            object c_serverCycle
-            public object serverCycle
 
     def __init__(self, defpfx="cx::", **kwargs):
         super().__init__()
@@ -30,7 +24,6 @@ cdef class Context(CdaObject):
             char *c_defpfx
         ascii_pfx = defpfx.encode("ascii") # encode to ascii
         c_defpfx = ascii_pfx  # convert to char*
-
 
         if 'other_opp_flag' in kwargs:
             if kwargs['other_opp_flag']:
@@ -44,11 +37,7 @@ cdef class Context(CdaObject):
         self.check_exception(ret)
         self.cid, self.defpfx, self.chans, self.channum = ret, defpfx, NULL, 0
 
-        IF SIGNAL_IMPL=='sl':
-            self.serverCycle = Signal()
-        ELIF SIGNAL_IMPL=='Qt':
-            self.c_serverCycle = SignalContainer()
-            self.serverCycle = self.c_serverCycle.signal
+        self.serverCycle = Signal(object)
 
     def __dealloc__(self):
         if self.cid > 0:
