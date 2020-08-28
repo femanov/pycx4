@@ -79,7 +79,7 @@ cdef class BaseChan(CdaObject):
         long rslv_stat         # resolving status
         str rslv_str           # resolving string
         double quant
-        int registered, first_cycle
+        int registered, first_cycle, lock_state
         Context context
         rflags_t rflags        # flags
         list rng               # ranges
@@ -93,7 +93,7 @@ cdef class BaseChan(CdaObject):
         char *units
         char *dpyfmt
     cdef public:
-        object valueMeasured, valueChanged, resolve
+        object valueMeasured, valueChanged, resolve, stringsUpdate, lockStateUpdate
 
     def __init__(self, str name, **kwargs):
         CdaObject.__init__(self)
@@ -106,6 +106,7 @@ cdef class BaseChan(CdaObject):
             self.dtype = dtype
 
         self.valueChanged, self.valueMeasured, self.resolve = Signal(object), Signal(object), Signal(object)
+        self.stringsUpdate, self.lockStateUpdate = Signal(object), Signal(object)
 
         b_name = name.encode("ascii")
         cdef:
@@ -237,20 +238,23 @@ cdef class BaseChan(CdaObject):
     cpdef get_strings(self):
         c_res = cda_strings_of_ref(self.ref, &self.ident, &self.label, &self.tip, &self.comment,
                                    &self.geoinfo, &self.rsrvd6, &self.units, &self.dpyfmt)
-        print("string update")
-        if self.ident != NULL: print("ident=", self.ident)
-        if self.label != NULL: print("label=", self.label)
-        if self.tip != NULL: print("tip=", self.tip)
-        if self.comment != NULL: print("comment=", self.comment)
-        if self.geoinfo != NULL: print("geoinfo=", self.geoinfo)
-        if self.rsrvd6 != NULL: print("rsrvd6=", self.rsrvd6)
-        if self.units != NULL: print("units=", self.units)
-        if self.dpyfmt != NULL: print("dpyfmt=", self.dpyfmt)
+        self.stringsUpdate.emit(self)
+        # if self.ident != NULL: print("ident=", self.ident)
+        # if self.label != NULL: print("label=", self.label)
+        # if self.tip != NULL: print("tip=", self.tip)
+        # if self.comment != NULL: print("comment=", self.comment)
+        # if self.geoinfo != NULL: print("geoinfo=", self.geoinfo)
+        # if self.rsrvd6 != NULL: print("rsrvd6=", self.rsrvd6)
+        # if self.units != NULL: print("units=", self.units)
+        # if self.dpyfmt != NULL: print("dpyfmt=", self.dpyfmt)
 
     cpdef get_lockstate(self):
-        print("updating lock state")
-        pass
+        self.lock_state = cda_lock_stat_of_ref(self.ref)
+        self.lockStateUpdate.emit(self)
 
     cpdef lock(self):
-        pass
-        #res = cda_lock_chans(1, &(self.ref), CX_LOCK_WRITE_SET)
+        cdef int ret = cda_lock_chans(1, &self.ref, CX_LOCK_WRITE_SET, 0)
+
+    cpdef unlock(self):
+        cdef int ret = cda_lock_chans(1, &self.ref, CX_LOCK_WRITE_RLS, 0)
+

@@ -160,7 +160,7 @@ cdef extern from "cda.h":
                                       cda_dataref_evproc_t  evproc,
                                       void                 *privptr2)
 
-    int cda_lock_chans(int count, cda_dataref_t *refs, int operation)
+    int cda_lock_chans(int count, cda_dataref_t *refs, int operation, int lockset_id)
 
     char *cda_combine_base_and_spec(cda_context_t     cid,
                                 const char           *base,

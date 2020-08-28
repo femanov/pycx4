@@ -3,7 +3,7 @@ from cx4.cxscheduler cimport sl_tout_proc, sl_enq_tout_after, sl_tid_t, sl_deq_t
 cdef void sltimer_proc(int uniq, void *privptr1, sl_tid_t tid, void *privptr2) with gil:
     cdef Timer t = <Timer>privptr2
     if t.repeat:
-        t.tid = sl_enq_tout_after(0, NULL, t.usecs, sltimer_proc, privptr2)
+        t.tid = sl_enq_tout_after(0, NULL, t.usec, sltimer_proc, privptr2)
     else:
         t.active = 0
     t.timeout.emit(t)
@@ -20,7 +20,7 @@ cdef class Timer:
     def __init__(self, int msec=1000):
         self.setInterval(msec)
         self.repeat = 1
-        self.timeout = Signal()
+        self.timeout = Signal(object)
 
     cpdef stop(self):
         if self.active == 1:
@@ -28,11 +28,10 @@ cdef class Timer:
             sl_deq_tout(self.tid)
 
     cpdef start(self):
-        if self.\
-                active == 1:
+        if self.active == 1:
             return
         self.active = 1
-        self.tid = sl_enq_tout_after(0, NULL, self.usecs, sltimer_proc, <void*>self)
+        self.tid = sl_enq_tout_after(0, NULL, self.usec, sltimer_proc, <void*>self)
 
     cpdef singleShot(self, int msec=0, proc=None):
         if msec > 0:
