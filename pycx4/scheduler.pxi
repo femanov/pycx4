@@ -15,3 +15,4 @@ cdef void at_select() with gil:
     select_interrupt_action()
 
 sl_set_select_behaviour(<sl_at_select_proc>NULL, <sl_at_select_proc>at_select, 0)
+
