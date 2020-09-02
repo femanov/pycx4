@@ -45,7 +45,7 @@ cdef void quant_update(int uniq, void *privptr1, cda_dataref_t ref, int reason,
         res = cda_rd_convert(ref, 0, &shift)
         res = cda_rd_convert(ref, quant_draw, &val)
         chan.quant = val - shift
-        print(chan.name, chan.quant)
+
 
 cdef void range_update(int uniq, void *privptr1, cda_dataref_t ref, int reason,
                         void *info_ptr, void *privptr2) with gil:
@@ -154,19 +154,23 @@ cdef class BaseChan(CdaObject):
 
         self.add_event(CDA_REF_EVMASK_LOCKSTAT, <void*>lockstat_update, <void*>self, NULL)
 
+        if kwargs.get('get_curval', False):
+            self.add_event(CDA_REF_EVMASK_CURVAL, <void*>evproc_update, <void*>self, NULL)
+
+        # CX event masks
+        ## <-- have some implementation
         # TODO: need to allow user to select registered events
 
-        ## <-- have some implementation
         ## CDA_REF_EVMASK_UPDATE
         # CDA_REF_EVMASK_STATCHG
-        # CDA_REF_EVMASK_STRSCHG
+        ## CDA_REF_EVMASK_STRSCHG
         # CDA_REF_EVMASK_RDSCHG
         # CDA_REF_EVMASK_FRESHCHG
         ## CDA_REF_EVMASK_QUANTCHG
         ## CDA_REF_EVMASK_RANGECHG
         ## CDA_REF_EVMASK_RSLVSTAT
-        # CDA_REF_EVMASK_CURVAL
-        # CDA_REF_EVMASK_LOCKSTAT
+        ## CDA_REF_EVMASK_CURVAL
+        ## CDA_REF_EVMASK_LOCKSTAT
 
         # initialization events (will be unregistered when get)
 
@@ -239,14 +243,6 @@ cdef class BaseChan(CdaObject):
         c_res = cda_strings_of_ref(self.ref, &self.ident, &self.label, &self.tip, &self.comment,
                                    &self.geoinfo, &self.rsrvd6, &self.units, &self.dpyfmt)
         self.stringsUpdate.emit(self)
-        # if self.ident != NULL: print("ident=", self.ident)
-        # if self.label != NULL: print("label=", self.label)
-        # if self.tip != NULL: print("tip=", self.tip)
-        # if self.comment != NULL: print("comment=", self.comment)
-        # if self.geoinfo != NULL: print("geoinfo=", self.geoinfo)
-        # if self.rsrvd6 != NULL: print("rsrvd6=", self.rsrvd6)
-        # if self.units != NULL: print("units=", self.units)
-        # if self.dpyfmt != NULL: print("dpyfmt=", self.dpyfmt)
 
     cpdef get_lockstate(self):
         self.lock_state = cda_lock_stat_of_ref(self.ref)
