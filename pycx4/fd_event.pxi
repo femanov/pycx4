@@ -2,7 +2,7 @@
 
 cdef void fd_event_proc(int uniq, void *privptr1, sl_fdh_t fdh, int fd, int mask, void *privptr2) with gil:
     cdef FdEvent fev = <FdEvent>privptr1
-    FdEvent.ready.emit(fev)
+    fev.ready.emit(fev)
 
 
 cdef class FdEvent:
