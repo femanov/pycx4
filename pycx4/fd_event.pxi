@@ -14,7 +14,7 @@ cdef class FdEvent:
     def __init__(self, file, mask=SL_RD):
         self.file = file
         self.mask = mask
-        ready = Signal(object)
+        self.ready = Signal(object)
         self.fhd = sl_add_fd(0, <void*>self, file.fileno(), mask, fd_event_proc, NULL)
 
     def __dealloc__(self):
