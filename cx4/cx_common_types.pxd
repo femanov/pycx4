@@ -3,7 +3,6 @@ from .misc_types cimport *
 
 cdef extern from "cx_common_types.h" nogil:
     ctypedef unsigned long         CxPixel
-    #ctypedef struct _CxWidgetType *CxWidget
 
     ctypedef int CxDataRef_t
     enum:

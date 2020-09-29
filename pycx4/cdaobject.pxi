@@ -5,7 +5,7 @@ cdef class CdaObject:
         event **events
         int evnum
 
-    def __init__(self):
+    def __cinit__(self, *args, **kvargs):
         self.events = NULL
         self.evnum = 0
 

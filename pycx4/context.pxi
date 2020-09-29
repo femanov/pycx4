@@ -16,8 +16,7 @@ cdef class Context(CdaObject):
         void **chans
         int channum
 
-    def __init__(self, defpfx="cx::", **kwargs):
-        super().__init__()
+    def __cinit__(self, defpfx="cx::", **kwargs):
         cdef:
             int ret
             int options = 0

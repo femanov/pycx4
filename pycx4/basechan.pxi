@@ -95,15 +95,24 @@ cdef class BaseChan(CdaObject):
     cdef public:
         object valueMeasured, valueChanged, resolve, stringsUpdate, lockStateUpdate
 
-    def __init__(self, str name, **kwargs):
-        CdaObject.__init__(self)
+    def __cinit__(self, str name, **kwargs):
+        #CdaObject.__init__(self)
         self.context = kwargs.get('context', default_context)
         self.max_nelems = kwargs.get('max_nelems', 1)
-        dtype = kwargs.get('dtype', CXDTYPE_DOUBLE)
-        if type(dtype) == str:
-            self.dtype = cx_dtype_map[dtype]
+
+        # that's bad... purent class know about subs, but works to force dtypes fro known cases
+        if isinstance(self, DChan):
+            self.dtype = CXDTYPE_DOUBLE
+        elif isinstance(self, IChan):
+            self.dtype = CXDTYPE_UINT32
+        elif isinstance(self, StrChan):
+            self.dtype = CXDTYPE_TEXT
         else:
-            self.dtype = dtype
+            dtype = kwargs.get('dtype', CXDTYPE_DOUBLE)
+            if type(dtype) == str:
+                self.dtype = cx_dtype_map[dtype]
+            else:
+                self.dtype = dtype
 
         self.valueChanged, self.valueMeasured, self.resolve = Signal(object), Signal(object), Signal(object)
         self.stringsUpdate, self.lockStateUpdate = Signal(object), Signal(object)
@@ -139,7 +148,7 @@ cdef class BaseChan(CdaObject):
         ret = cda_add_chan((<Context>self.context).cid, NULL, c_name, options, self.dtype, self.max_nelems,
                            0, <cda_dataref_evproc_t>NULL, NULL)
         self.check_exception(ret)
-        self.ref, self.name, self.itemsize = ret, name, sizeof_cxdtype(dtype)
+        self.ref, self.name, self.itemsize = ret, name, sizeof_cxdtype(self.dtype)
 
         (<Context>self.context).save_chan(<void*>self)
 

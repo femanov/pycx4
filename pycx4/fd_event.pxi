@@ -11,7 +11,7 @@ cdef class FdEvent:
         int mask
         sl_fdh_t fhd
 
-    def __init__(self, file, mask=SL_RD):
+    def __cinit__(self, file, mask=SL_RD):
         self.file = file
         self.mask = mask
         self.ready = Signal(object)

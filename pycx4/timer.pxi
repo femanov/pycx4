@@ -17,7 +17,7 @@ cdef class Timer:
         sl_tid_t tid
         Signal timeout
 
-    def __init__(self, int msec=1000):
+    def __cinit__(self, int msec=1000):
         self.setInterval(msec)
         self.repeat = 1
         self.timeout = Signal(object)

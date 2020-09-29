@@ -2,7 +2,7 @@
 # misc types declarations from bolkhov's misc_types.h
 # by Fedor Emanov
 
-cdef extern from "misc_types.h" nogil:
+cdef extern from "misc_types.h":
     ctypedef   signed int    int32
     ctypedef unsigned int    uint32
     ctypedef   signed short  int16

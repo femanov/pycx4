@@ -11,9 +11,10 @@ cdef class DChan(BaseChan):
         # all general properties defined in base classes
         readonly double val, prev_val, tolerance
 
-    def __init__(self, str name, **kwargs):
-        kwargs['dtype'] = CXDTYPE_DOUBLE
-        BaseChan.__init__(self, name, **kwargs)
+    def __cinit__(self, str name, **kwargs):
+        #check if dtype is correct&
+        #kwargs['dtype'] = CXDTYPE_DOUBLE
+        #BaseChan.__init__(self, name, **kwargs)
         self.val, self.prev_val, self.tolerance = 0.0, 0.0, 0.0
 
     cdef void cb(self):

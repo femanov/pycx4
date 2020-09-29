@@ -44,7 +44,7 @@ try:
     import PyQt5
 
     extensions.append(Extension('pycx4.q5cda', ['./pycx4/q5cda' + ext],
-              include_dirs=[numpy.get_include(), cx_include, '/usr/include/x86_64-linux-gnu/qt5/QtCore', ],
+              include_dirs=[numpy.get_include(), cx_include, '/usr/include/x86_64-linux-gnu/qt5/QtCore'],
               libraries=['cda', 'cx_async', 'useful', 'misc', 'Qt5cxscheduler', 'Qt5Core'],
               library_dirs=[cx_lib]
               ))
@@ -63,7 +63,8 @@ directives = {
     'wraparound': False,
     'cdivision': True,
     'always_allow_keywords': False,
-    'initializedcheck': False
+    'initializedcheck': False,
+    'infer_types': True
 }
 
 if USE_CYTHON:
@@ -84,14 +85,12 @@ setup(
     packages=['pycx4'],
     platforms='Linux',
     classifiers=[
-        "Intended Audience :: Developers",
+        "Intended Audience :: Developers, charged particle beam accelerator control systems people",
         "License :: OSI Approved :: GNU General Public License (GPL)",
         "Operating System :: POSIX",
         "Operating System :: POSIX :: BSD",
         "Operating System :: POSIX :: Linux",
         "Programming Language :: Python",
-        "Programming Language :: Python :: 2",
-        "Programming Language :: Python :: 2.7",
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.2",
         "Programming Language :: Python :: 3.3",

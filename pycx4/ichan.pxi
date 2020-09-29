@@ -4,9 +4,9 @@ cdef class IChan(BaseChan):
         # all general properties defined in base classes
         readonly int val, prev_val, tolerance
 
-    def __init__(self, str name, **kwargs):
-        kwargs['dtype'] = CXDTYPE_UINT32
-        BaseChan.__init__(self, name, **kwargs)
+    def __cinit__(self, str name, **kwargs):
+        #kwargs['dtype'] = CXDTYPE_UINT32
+        #BaseChan.__init__(self, name, **kwargs)
         self.tolerance = 0
 
     cdef void cb(self):

@@ -13,10 +13,6 @@ cdef extern from "cx.h" nogil:
     ctypedef uint32 rflags_t
     ctypedef uint32 cxdtype_t
 
-    #ctypedef int32  cx_ival_t
-    #ctypedef int64  cx_lval_t
-    #ctypedef double cx_dval_t
-
     ctypedef struct cx_time_t:
         int sec
         int nsec
