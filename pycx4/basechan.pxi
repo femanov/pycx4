@@ -96,7 +96,6 @@ cdef class BaseChan(CdaObject):
         object valueMeasured, valueChanged, resolve, stringsUpdate, lockStateUpdate
 
     def __cinit__(self, str name, **kwargs):
-        #CdaObject.__init__(self)
         self.context = kwargs.get('context', default_context)
         self.max_nelems = kwargs.get('max_nelems', 1)
 

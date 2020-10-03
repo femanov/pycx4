@@ -1,6 +1,7 @@
 from setuptools import setup
 from setuptools.extension import Extension
-import numpy
+#import numpy
+#numpy.get_include()
 import sys
 import os.path
 from pycx4.aux import cx_installpath
@@ -22,34 +23,45 @@ if os.path.isfile('./pycx4/pycda.pyx'):
     USE_CYTHON = True
     ext = '.pyx'
 
+# 2DO: currently compiler/linker flags '-march=native' can produce code which
+# may be not able to run on other machine...
+compiler_args = ['-march=native']
+link_args = ['-march=native']
+
 extensions = [
     Extension('pycx4.pycda', ['./pycx4/pycda' + ext],
-              include_dirs=[numpy.get_include(), cx_include],
+              include_dirs=[cx_include],
               libraries=['cda', 'cx_async', 'useful', 'misc', 'cxscheduler'],
-              library_dirs=[cx_lib]
+              library_dirs=[cx_lib],
+              extra_compile_args=compiler_args,
+              extra_link_args=link_args,
               )]
 
 try:
     import PyQt4
 
     extensions.append(Extension('pycx4.q4cda', ['./pycx4/q4cda' + ext],
-          include_dirs=[numpy.get_include(), cx_include, '/usr/include/x86_64-linux-gnu/qt4/QtCore',],
+          include_dirs=[cx_include, '/usr/include/x86_64-linux-gnu/qt4/QtCore',],
           libraries=['cda', 'cx_async', 'useful', 'misc', 'Qt4cxscheduler', 'QtCore'],
-          library_dirs=[cx_lib]
-         ))
+          library_dirs=[cx_lib],
+          extra_compile_args=compiler_args,
+          extra_link_args=link_args,
+    ))
 except ImportError:
-    pass
+    print('PyQt4 not found. Building of corresponding module skipped')
 
 try:
     import PyQt5
 
     extensions.append(Extension('pycx4.q5cda', ['./pycx4/q5cda' + ext],
-              include_dirs=[numpy.get_include(), cx_include, '/usr/include/x86_64-linux-gnu/qt5/QtCore'],
+              include_dirs=[cx_include, '/usr/include/x86_64-linux-gnu/qt5/QtCore'],
               libraries=['cda', 'cx_async', 'useful', 'misc', 'Qt5cxscheduler', 'Qt5Core'],
-              library_dirs=[cx_lib]
-              ))
+              library_dirs=[cx_lib],
+              extra_compile_args=compiler_args,
+              extra_link_args=link_args,
+    ))
 except ImportError:
-    pass
+    print('PyQt4 not found. Building of corresponding module skipped')
 
 
 # Cython directives
@@ -81,7 +93,7 @@ setup(
     license='GPL',
     description='CXv4 control system framework Python bindings',
     long_description='CXv4 control system framework Python bindings, pycda and qcda modules',
-    install_requires=["numpy >= 1.7", ],
+    #install_requires=["numpy >= 1.7", ], # currently numpy not required, but can be used as earlier
     packages=['pycx4'],
     platforms='Linux',
     classifiers=[
@@ -92,10 +104,6 @@ setup(
         "Operating System :: POSIX :: Linux",
         "Programming Language :: Python",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.2",
-        "Programming Language :: Python :: 3.3",
-        "Programming Language :: Python :: 3.4",
-        "Programming Language :: Python :: 3.5",
         "Programming Language :: Python :: Implementation :: CPython",
         "Programming Language :: Cython",
         "Topic :: Scientific/Engineering",

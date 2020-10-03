@@ -1,43 +1,36 @@
 # vector-data channel class
 cdef class VChan(BaseChan):
     cdef:
-        readonly np.ndarray val
-        readonly view.array cval
-        readonly np.ndarray background
+        readonly object val  # showing data to numpy
+        readonly array.array cval# that one really owns data
+        #readonly np.ndarray background, bg_val
         readonly int nelems
         int average
         int bg_count
         bint change_sign, dont_update, getting_background, bg_apply, bg_ready
 
     def __cinit__(self, str name, **kwargs):
-        #BaseChan.__init__(self, name, **kwargs)
         self.change_sign = kwargs.get('change_sign', False)
-        #self.cval = view.array(shape=(1,), itemsize=sizeof_cxdtype(self.dtype), format=dtype_format(self.dtype))
-        self.val = np.empty(1, cxdtype2np(self.dtype), order='C')
-        self.nelems = 1
         self.getting_background = False
         self.bg_ready = False
+        self.cval = array.array(cxdtype2pycode(self.dtype))
+        self.init_val(1)
 
     cdef void init_val(self, int size):
-        self.cval = view.array(shape=(size,), itemsize=sizeof_cxdtype(self.dtype), format=dtype_format(self.dtype))
-        self.val = np.asarray(self.cval.memview)
+        array.resize(self.cval, size)
+        if using_numpy:
+            self.val = np.asarray(self.cval)
         self.nelems = size
 
     cdef void cb(self):
         cdef int nelems = self.current_nelems()
         if self.nelems != nelems:
-            self.nelems = nelems
-            self.val.resize(nelems)
+            self.init_val(nelems)
 
-        c_len = self.get_data(0, self.itemsize * nelems, <void*>self.val.data)
+        c_len = self.get_data(0, self.itemsize * nelems, self.cval.data.as_voidptr)
         nelems_read = int(c_len/self.itemsize)
         if self.change_sign:
-            self.val *= -1
-        if self.getting_background:
-            self.background += self.val/10
-            self.bg_count -= 1
-            if self.bg_count == 0:
-                self.getting_background = False
+            self.val *= -1 # unlike what happens in python here it makes multiplication inplace
 
         self.valueMeasured.emit(self)
         self.valueChanged.emit(self)
@@ -66,13 +59,17 @@ cdef class VChan(BaseChan):
     #     dtype = np2cxdtype(value.dtype)
     #     self.snd_data(dtype, value.size, <void*>value.data)
 
-    cpdef void getBackgroung(self):
-        self.getting_background = True
-        self.bgcount = 10
-        self.bg_apply = False
-        self.bg_ready = False
-        self.background = np.zeros(self.nelems)
+    # cpdef void getBackgroung(self):
+    #     self.getting_background = True
+    #     self.bgcount = 10
+    #     self.bg_apply = False
+    #     self.bg_ready = False
+    #     self.background = np.zeros(self.nelems)
+    #     self.bg_val = np.empty(self.nelems)
+    #     print("gtting background")
+    #
+    # cpdef void setApplyBackground(self):
+    #     if not self.bg_ready:
+    #         return
 
-    cpdef void setApplyBackground(self):
-        if self.getting_background:
-            return
+

@@ -1,12 +1,12 @@
 # simple cycthon implementation of signals
 from cpython cimport Py_INCREF,Py_DECREF
 
+@cython.freelist(5)
 cdef class Signal:
     cdef:
         void **callbacks
         int cnum
 
-# let's rely on default definitions, ha-ha. if any problems - will change it
     def __cinit__(self, *args):
         self.callbacks = NULL
         self.cnum = 0

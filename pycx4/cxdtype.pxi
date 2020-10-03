@@ -52,22 +52,6 @@ ctypedef fused atype:
 # function for pythonize cx-any-val
 # not to effective, but not a bottleneck
 cdef:
-    str dtype_format(cxdtype_t t):
-        cdef int t_r = reprof_cxdtype(t)
-        if t_r == CXDTYPE_REPR_INT:
-            return 'i'
-        elif t_r == CXDTYPE_REPR_FLOAT:
-            return 'f'
-        elif t_r == CXDTYPE_REPR_TEXT:
-            return 't'
-        elif t_r == CXDTYPE_REPR_UNKNOWN:
-            return 'u'
-
-
-    #size_t sizeof_cxdtype(cxdtype_t t)
-    #int    reprof_cxdtype(cxdtype_t t)
-
-
     aval_value(CxAnyVal_t *aval, cxdtype_t dtype):
         if dtype == CXDTYPE_DOUBLE: return aval.f64
         elif dtype == CXDTYPE_INT32:  return aval.i32
@@ -100,44 +84,28 @@ cdef:
     void aval_set(atype value,  CxAnyVal_t *aval):
         if atype is float64: aval.f64 = value
         if atype is float32: aval.f32 = value
-        #if atype is int64: aval.i64 = value
+        if atype is int64: aval.i64 = value
         if atype is int32: aval.i32 = value
         if atype is int16: aval.i16 = value
         if atype is int8: aval.i8 = value
-        #if atype is uint64: aval.u64 = value
+        if atype is uint64: aval.u64 = value
         if atype is uint32: aval.u32 = value
         if atype is uint16: aval.u16 = value
         if atype is uint8: aval.u8 = value
         if atype is char8: aval.c8 = value
         if atype is char32: aval.c32 = value
 
-
-    # dtype conversion numpy <--> CX
-    # there are no text or unicode text.
-    # Cause text and unicode text can't be mixed with numbers in a good way
-    object cxdtype2np(cxdtype_t dtype):
-        if dtype == CXDTYPE_DOUBLE: return np.double
-        elif dtype == CXDTYPE_INT32:  return np.int32
-        elif dtype == CXDTYPE_INT8:   return np.int8
-        elif dtype == CXDTYPE_INT16:  return np.int16b
-        elif dtype == CXDTYPE_INT64:  return np.int64
-        elif dtype == CXDTYPE_UINT8:  return np.uint8
-        elif dtype == CXDTYPE_UINT16: return np.uint16
-        elif dtype == CXDTYPE_UINT32: return np.uint32
-        elif dtype == CXDTYPE_UINT64: return np.uint64
-        elif dtype == CXDTYPE_SINGLE: return np.single
+    str cxdtype2pycode(cxdtype_t dtype):
+        if dtype == CXDTYPE_DOUBLE: return 'd'
+        elif dtype == CXDTYPE_SINGLE: return 'f'
+        elif dtype == CXDTYPE_INT32:  return 'l'
+        elif dtype == CXDTYPE_INT8:   return 'b'
+        elif dtype == CXDTYPE_INT16:  return 'h'
+        elif dtype == CXDTYPE_INT64:  return 'q'
+        elif dtype == CXDTYPE_UINT8:  return 'B'
+        elif dtype == CXDTYPE_UINT16: return 'H'
+        elif dtype == CXDTYPE_UINT32: return 'L'
+        elif dtype == CXDTYPE_UINT64: return 'Q'
         return None
 
-    # cxdtype_t np2cxdtype(object dtype):
-    #     if dtype == np.double:      return CXDTYPE_DOUBLE
-    #     elif dtype == np.int32:       return CXDTYPE_INT32
-    #     elif dtype == np.int8:        return CXDTYPE_INT8
-    #     elif dtype == np.int16:       return CXDTYPE_INT16
-    #     elif dtype == np.int64:       return CXDTYPE_INT64
-    #     elif dtype == np.uint8:       return CXDTYPE_UINT8
-    #     elif dtype == np.uint16:      return CXDTYPE_UINT16
-    #     elif dtype == np.uint32:      return CXDTYPE_UINT32
-    #     elif dtype == np.uint64:      return CXDTYPE_UINT64
-    #     elif dtype == np.single:      return CXDTYPE_SINGLE
-    #     return 0
 
