@@ -92,7 +92,6 @@ cdef class BaseChan(CdaObject):
         char *rsrvd6
         char *units
         char *dpyfmt
-    cdef public:
         object valueMeasured, valueChanged, resolve, stringsUpdate, lockStateUpdate
 
     def __cinit__(self, str name, **kwargs):

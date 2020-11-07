@@ -47,6 +47,24 @@ ctypedef fused atype:
     char32
     #int64 yet unsupported
     #uint64  yet unsupported
+# currently int64 generates the same func prototype as int and will not work
+# that's cython behavior, not cpp for example
+
+# this needed for independent typing of 2-args functions
+ctypedef fused atype2:
+    float64
+    float32
+    int32
+    int16
+    int8
+    uint32
+    uint16
+    uint8
+    char8
+    char32
+    #int64 yet unsupported
+    #uint64  yet unsupported
+
 
 
 # function for pythonize cx-any-val
