@@ -99,7 +99,7 @@ cdef class BaseChan(CdaObject):
         self.max_nelems = kwargs.get('max_nelems', 1)
 
         # that's bad... purent class know about subs, but works to force dtypes fro known cases
-        if isinstance(self, DChan):
+        if isinstance(self, DChan) or isinstance(self, VPChan):
             self.dtype = CXDTYPE_DOUBLE
         elif isinstance(self, IChan):
             self.dtype = CXDTYPE_UINT32

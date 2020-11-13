@@ -2,29 +2,59 @@
 
 # Utility functions to avoid dependencies
 # this functions do not perform any checks... to be used with precautions
+# # v * a inplace
+# def vector_mult(atype[::1] v, double a):
+#     cdef int i
+#     for i in range(len(v)):
+#         v[i] = <atype>(v[i] * a)
+#
+# def vector_iadd(atype[::1] v1, atype2[::1] v2):
+#     cdef int i
+#     for i in range(len(v1)):
+#         v1[i] += <atype>v2[i]
+#
+# def vector_isub(double[::1] v1, double[::1] v2):
+#     cdef int i
+#     for i in range(len(v1)):
+#         v1[i] -= v2[i]
+#
+# def vector_sub(double[::1] vout, atype[::1] v1, double[::1] v2):
+#     cdef int i
+#     for i in range(len(v1)):
+#         vout[i] = <double>v1[i] - v2[i]
+#
+# def avg(atype[::1] vin, int wi, int wf):
+#     cdef:
+#         int i
+#         double a=0
+#     for i in range(wi, wf):
+#         a += vin[i]
+#     a /= wf-wi
+#     return a
 
+# this supports just double, but faster and lighter
 # v * a inplace
-def vector_mult(atype[::1] v, double a):
+cdef vector_mult(double[::1] v, double a):
     cdef int i
     for i in range(len(v)):
-        v[i] = <atype>(v[i] * a)
+        v[i] = (v[i] * a)
 
-def vector_iadd(atype[::1] v1, atype2[::1] v2):
+cdef vector_iadd(double[::1] v1, double[::1] v2):
     cdef int i
     for i in range(len(v1)):
-        v1[i] += <atype>v2[i]
+        v1[i] += v2[i]
 
-def vector_isub(double[::1] v1, double[::1] v2):
+cdef vector_isub(double[::1] v1, double[::1] v2):
     cdef int i
     for i in range(len(v1)):
         v1[i] -= v2[i]
 
-def vector_sub(double[::1] vout, atype[::1] v1, double[::1] v2):
+cdef vector_sub(double[::1] vout, double[::1] v1, double[::1] v2):
     cdef int i
     for i in range(len(v1)):
-        vout[i] = <double>v1[i] - v2[i]
+        vout[i] = v1[i] - v2[i]
 
-def avg(atype[::1] vin, int wi, int wf):
+cdef avg(double[::1] vin, int wi, int wf):
     cdef:
         int i
         double a=0
@@ -32,6 +62,7 @@ def avg(atype[::1] vin, int wi, int wf):
         a += vin[i]
     a /= wf-wi
     return a
+
 
 
 # vector-data channel class with some data processing capabilities
@@ -42,7 +73,6 @@ cdef class VPChan(VChan):
         readonly object avgReady, bgReady # extra signals
         readonly int reg_s, reg_f
         readonly double reg_avg
-
 
         int n_avg, avg_count
         int bg_count, bg_anum
