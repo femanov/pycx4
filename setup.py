@@ -93,7 +93,6 @@ setup(
     license='GPL',
     description='CXv4 control system framework Python bindings',
     long_description='CXv4 control system framework Python bindings, pycda and qcda modules',
-    #install_requires=["numpy >= 1.7", ], # currently numpy not required, but can be used as earlier
     packages=['pycx4'],
     platforms='Linux',
     classifiers=[
