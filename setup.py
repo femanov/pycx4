@@ -96,7 +96,6 @@ setup(
     packages=['pycx4'],
     platforms='Linux',
     classifiers=[
-        "Intended Audience :: Developers, charged particle beam accelerator control systems people",
         "License :: OSI Approved :: GNU General Public License (GPL)",
         "Operating System :: POSIX",
         "Operating System :: POSIX :: BSD",
