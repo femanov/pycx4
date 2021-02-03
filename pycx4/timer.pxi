@@ -6,7 +6,7 @@ cdef void sltimer_proc(int uniq, void *privptr1, sl_tid_t tid, void *privptr2) w
         t.tid = sl_enq_tout_after(0, NULL, t.usec, sltimer_proc, privptr2)
     else:
         t.active = 0
-    t.timeout.emit(t)
+    t.timeout.emit()
 
 
 cdef class Timer:

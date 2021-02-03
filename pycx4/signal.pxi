@@ -57,3 +57,4 @@ cdef class Signal:
         cdef int ind
         for ind in range(self.cnum):
             (<object>(self.callbacks[ind]))(*args)
+
