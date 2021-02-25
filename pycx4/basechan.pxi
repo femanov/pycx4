@@ -82,7 +82,7 @@ cdef class BaseChan(CdaObject):
         int registered, first_cycle, lock_state
         Context context
         rflags_t rflags        # flags
-        list rng               # ranges
+        double rng[2]          # ranges
         # strings of ref
         char *ident
         char *label
@@ -184,7 +184,7 @@ cdef class BaseChan(CdaObject):
         self.registered, self.first_cycle = True, True
         self.rslv_stat = CDA_RSLVSTAT_SEARCHING
         self.rslv_str = 'searching'
-        self.rng = []
+        self.rng[0],self.rng[1] = 0,0
 
     def __dealloc__(self):
         if self.registered:
@@ -238,13 +238,21 @@ cdef class BaseChan(CdaObject):
 
     # TESTING functions, not yet fully implemented
     cpdef get_range(self):
-        cdef CxAnyVal_t r[2]
-        cdef cxdtype_t dt
+        cdef:
+            CxAnyVal_t r[2]
+            double raw_r
+            cxdtype_t dt
+            int c_res
+
         c_res = cda_range_of_ref(self.ref, r, &dt)
         if dt == CXDTYPE_UNKNOWN:
-            self.rng = []
+            self.rng[0], self.rng[1] = 0, 0
         else:
-            self.rng = [aval_value(&(r[0]), dt), aval_value(&(r[1]), dt)]
+            raw_r = aval_value(&(r[0]), dt)
+            c_res = cda_rd_convert(self.ref, raw_r, &self.rng[0])
+
+            raw_r = aval_value(&(r[1]), dt)
+            c_res = cda_rd_convert(self.ref, raw_r, &self.rng[1])
 
     cpdef get_strings(self):
         c_res = cda_strings_of_ref(self.ref, &self.ident, &self.label, &self.tip, &self.comment,
