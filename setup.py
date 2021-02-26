@@ -25,8 +25,8 @@ if os.path.isfile('./pycx4/pycda.pyx'):
 
 # 2DO: currently compiler/linker flags '-march=native' can produce code which
 # may be not able to run on other machine...
-compiler_args = ['-march=native']
-link_args = ['-march=native']
+compiler_args = [] #['-march=native']
+link_args = [] #['-march=native']
 
 extensions = [
     Extension('pycx4.pycda', ['./pycx4/pycda' + ext],
