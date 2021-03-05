@@ -68,3 +68,28 @@ cdef list rflags_text(rflags_t rflags):
         ret.append('Value in yellow zone')
 
     return ret
+
+rflags_meanings = {
+'No X from CAMAC device': CXRF_CAMAC_NO_X,
+'No Q from CAMAC device': CXRF_CAMAC_NO_Q,
+'I/O timeout expired': CXRF_IO_TIMEOUT,
+'Remote controller problem': CXRF_REM_C_PROBL,
+'Input channel overload': CXRF_OVERLOAD,
+'Unsupported feature/channel': CXRF_UNSUPPORTED,
+'Invalid parameter': CXRF_INVAL,
+'Wrong device': CXRF_WRONG_DEV,
+'Configuration problem': CXRF_CFG_PROBL,
+'Driver internal problem': CXRF_DRV_PROBL,
+'Driver loading problem': CXRF_NO_DRV,
+'Device is offline': CXRF_OFFLINE,
+'Formula calculation error': CXCF_FLAG_CALCERR,
+'Defunct channel': CXCF_FLAG_DEFUNCT,
+'Other operator is active': CXCF_FLAG_OTHEROP,
+'Channel was programmatically changed': CXCF_FLAG_PRGLYCHG,
+'Channel not found': CXCF_FLAG_NOTFOUND,
+'Value is weird': CXCF_FLAG_COLOR_WEIRD,
+'Alarm!': CXCF_FLAG_ALARM_ALARM,
+'Relaxing after alarm': CXCF_FLAG_ALARM_RELAX,
+'Value in red zone': CXCF_FLAG_COLOR_RED,
+'Value in yellow zone': CXCF_FLAG_COLOR_YELLOW,
+}

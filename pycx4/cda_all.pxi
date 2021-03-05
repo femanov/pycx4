@@ -4,4 +4,5 @@ __all__ = ['Context', 'StrChan', 'DChan', 'IChan', 'Chan', 'VChan', 'VPChan',
            'DTYPE_UINT32', 'DTYPE_UINT64', 'DTYPE_SINGLE', 'DTYPE_DOUBLE', 'DTYPE_TEXT', 'DTYPE_UCTEXT',
            'RSLVSTAT_NOTFOUND', 'RSLVSTAT_SEARCHING', 'RSLVSTAT_FOUND',
            'ChanFactory', 'cfactory',
+           'rflags_meanings'
     ]
