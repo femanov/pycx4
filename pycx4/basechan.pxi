@@ -5,13 +5,6 @@ cdef void evproc_rslvstat(int uniq, void *privptr1, cda_dataref_t ref, int reaso
                           void *info_ptr, void *privptr2) with gil:
     cdef BaseChan chan = <BaseChan>(<event*>privptr2).objptr
     chan.rslv_stat = <long>info_ptr # resolve status passed through this pointer
-
-    if chan.rslv_stat == CDA_RSLVSTAT_NOTFOUND:
-        chan.rslv_str = 'not found'
-    elif chan.rslv_stat == CDA_RSLVSTAT_SEARCHING:
-        chan.rslv_str = 'searching'
-    elif chan.rslv_stat == CDA_RSLVSTAT_FOUND:
-        chan.rslv_str = 'found'
     chan.resolve.emit(chan)
 
 
@@ -21,7 +14,6 @@ cdef void evproc_update(int uniq, void *privptr1, cda_dataref_t ref, int reason,
         cx_time_t timestr
         BaseChan chan = <BaseChan>(<event*>privptr2).objptr
     chan.check_exception( cda_get_ref_stat(ref, &chan.rflags, &timestr) )
-
     chan.prev_time = chan.time
     chan.time = <int64>timestr.sec * 1000000 + timestr.nsec / 1000
     chan.cb()
@@ -77,7 +69,6 @@ cdef class BaseChan(CdaObject):
         size_t itemsize        # item size in bytes
         int64 time, prev_time  # last and prev data update time
         long rslv_stat         # resolving status
-        str rslv_str           # resolving string
         double quant
         int registered, first_cycle, lock_state
         Context context
@@ -183,7 +174,6 @@ cdef class BaseChan(CdaObject):
 
         self.registered, self.first_cycle = True, True
         self.rslv_stat = CDA_RSLVSTAT_SEARCHING
-        self.rslv_str = 'searching'
         self.rng[0],self.rng[1] = 0,0
 
     def __dealloc__(self):
@@ -232,9 +222,6 @@ cdef class BaseChan(CdaObject):
         if self.rslv_stat == CDA_RSLVSTAT_FOUND:
             return True
         return False
-
-    cpdef rflags_text(self):
-        return rflags_text(self.rflags)
 
     # TESTING functions, not yet fully implemented
     cpdef get_range(self):

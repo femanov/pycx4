@@ -14,7 +14,14 @@ from cx4.cx cimport *
 from cx4.cda cimport *
 
 
-RSLVSTAT_NOTFOUND = CDA_RSLVSTAT_NOTFOUND
-RSLVSTAT_SEARCHING = CDA_RSLVSTAT_SEARCHING
-RSLVSTAT_FOUND = CDA_RSLVSTAT_FOUND
+cdef class RslvStatsClass:
+    cdef readonly:
+        long found
+        long searching
+        long notfound
+    def __cinit__(self):
+        self.found = CDA_RSLVSTAT_FOUND
+        self.searching = CDA_RSLVSTAT_SEARCHING
+        self.notfound = CDA_RSLVSTAT_NOTFOUND
 
+RslvStats = RslvStatsClass()
