@@ -50,7 +50,7 @@ cpdef set rflags_text(rflags_t rflags):
 
 cpdef tuple rflags_color_status(rflags_t rflags):
     if rflags == 0:
-        return '', 'normal'
+        return None, 'normal'
     elif (rflags & CXRF_CAMAC_NO_X) > 0 or\
          (rflags & CXRF_CAMAC_NO_Q) > 0 or\
          (rflags & CXRF_IO_TIMEOUT) > 0 or \
