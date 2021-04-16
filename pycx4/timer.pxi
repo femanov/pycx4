@@ -52,7 +52,8 @@ cdef class Timer:
             self.timeout.connect(proc)
         self.active = 1
         self.repeat = 0
-        self.start()
+        self.tid = sl_enq_tout_after(0, NULL, self.usec, sltimer_proc, <void*>self)
+
 
     cpdef int interval(self):
         return <int>(self.usec/1000)
