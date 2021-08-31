@@ -8,14 +8,14 @@ cpdef break_():
     sl_break()
 
 
-#  required to react to signals in case of daemon
-def select_interrupt_action():
-    pass
-
-cdef void at_select() with gil:
-    select_interrupt_action()
-
-sl_set_select_behaviour(<sl_at_select_proc>NULL, <sl_at_select_proc>at_select, 0)
+# some deprecated code to
+# def select_interrupt_action():
+#     pass
+#
+# cdef void at_select() with gil:
+#     select_interrupt_action()
+#
+# sl_set_select_behaviour(<sl_at_select_proc>NULL, <sl_at_select_proc>at_select, 100000)
 
 SL_RD = sl.SL_RD
 SL_WR = sl.SL_WR
