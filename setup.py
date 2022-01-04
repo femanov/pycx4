@@ -1,7 +1,6 @@
 from setuptools import setup
 from setuptools.extension import Extension
-#import numpy
-#numpy.get_include()
+
 import sys
 import os.path
 from pycx4.aux import cx_installpath
@@ -23,10 +22,8 @@ if os.path.isfile('./pycx4/pycda.pyx'):
     USE_CYTHON = True
     ext = '.pyx'
 
-# 2DO: currently compiler/linker flags '-march=native' can produce code which
-# may be not able to run on other machine...
-compiler_args = ['-mmmx'] #['-march=native']
-link_args = ['-mmmx'] #['-march=native']
+compiler_args = []
+link_args = []
 
 extensions = [
     Extension('pycx4.pycda', ['./pycx4/pycda' + ext],
