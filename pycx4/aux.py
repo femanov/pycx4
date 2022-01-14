@@ -20,6 +20,11 @@ def cx_installpath():
     except KeyError:
         pass
 
+    try:
+        search_pathes.append(pwd.getpwnam('pi').pw_dir + '/4pult')
+    except KeyError:
+        pass
+
     # if this subdirs are exist - let's say it' valid cx install place
     subdirs = ['/include', '/lib']
     for basedir in search_pathes:

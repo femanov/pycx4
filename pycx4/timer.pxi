@@ -34,7 +34,7 @@ cdef class Timer:
             sl_deq_tout(self.tid)
 
     cpdef void start(self):
-        """start timer for reriodic shots.
+        """start timer for periodic shots.
          If timer is active it will be sopped and restarted"""
         if self.active == 1:
             sl_deq_tout(self.tid)

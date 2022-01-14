@@ -1,0 +1,3 @@
+include cx4/*
+include pycx4/*.pxi
+include pycx4/*.pyx
