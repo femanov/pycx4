@@ -55,6 +55,7 @@ cdef class Signal:
 
     def emit(self, *args):
         cdef int ind
+        print('emit call: ', self.cnum)
         for ind in range(self.cnum):
             (<object>(self.callbacks[ind]))(*args)
 

@@ -1,12 +1,7 @@
-
-
 from pycda cimport *
 
 import numpy as np
 from numpy.polynomial.polynomial import *
-
-
-
 
 class middleChan(object):
     def __init__(self, source_name, middle_name, srclim=None):
