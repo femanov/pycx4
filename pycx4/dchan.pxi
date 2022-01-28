@@ -23,7 +23,7 @@ cdef class DChan(BaseChan):
         self.first_cycle = False
 
     cpdef void setValue(self, double value):
-        print(f'set value call, cname:{self.cname}, value: {value}' )
+        print(f'set value call, cname:{self.name}, value: {value}' )
         self.check_exception( cda_set_dcval(self.ref, value) )
 
     cpdef void setTolerance(self, double new_tolerance):
