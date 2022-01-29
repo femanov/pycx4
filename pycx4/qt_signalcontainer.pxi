@@ -10,6 +10,6 @@ class SigContainer(QObject):
         inst.emit, inst.connect, inst.disconnect = inst.sig.emit, inst.sig.connect, inst.sig.disconnect
         return inst
 
-
-Signal = SigContainer
+# use container as instance signal
+InstSignal = SigContainer
 

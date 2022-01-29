@@ -103,8 +103,8 @@ cdef class BaseChan(CdaObject):
             else:
                 self.dtype = dtype
 
-        self.valueChanged, self.valueMeasured, self.resolve = Signal(object), Signal(object), Signal(object)
-        self.stringsUpdate, self.lockStateUpdate = Signal(object), Signal(object)
+        self.valueChanged, self.valueMeasured, self.resolve = InstSignal(object), InstSignal(object), InstSignal(object)
+        self.stringsUpdate, self.lockStateUpdate = InstSignal(object), InstSignal(object)
 
         b_name = name.encode("ascii")
         cdef:

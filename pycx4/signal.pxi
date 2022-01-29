@@ -1,8 +1,16 @@
-# simple cycthon implementation of signals
+# Simple cython implementation of Qt-like signals.
+# Created in order to reuse some code in Qt and CX-native applications
+# This class don't enforce signal/slot argument types.
+# Slot can be connected only once, next connections are ignored.
+# name and owner can be passed through kwargs, once were used for debugging, may be need to remove it.
+
 from cpython cimport Py_INCREF,Py_DECREF
 
-@cython.freelist(5)
-cdef class Signal:
+@cython.freelist(10)
+cdef class InstSignal:
+    """
+    Instance signal
+    """
     cdef:
         void **callbacks
         int cnum
@@ -10,6 +18,7 @@ cdef class Signal:
         str owner
 
     def __cinit__(self, *args, **kwargs):
+        # name and owner once were needed for debugging
         self.name = kwargs.get('name', None)
         self.owner = kwargs.get('owner', None)
         self.callbacks = NULL
@@ -29,6 +38,7 @@ cdef class Signal:
             raise ValueError('callable was expected')
         for ind in range(self.cnum):
             if slot == <object>self.callbacks[ind]:
+                #
                 return
         tmp = realloc(<void*>self.callbacks, sizeof(void*) * (self.cnum+1))
         if not tmp: raise MemoryError()
@@ -37,12 +47,12 @@ cdef class Signal:
         self.cnum += 1
         Py_INCREF(slot)
 
-    cpdef disconnect(self, callback):
+    cpdef disconnect(self, slot):
         cdef:
             void *tmp
             int ind
         for ind in range(self.cnum):
-            if callback == <object>self.callbacks[ind]:
+            if slot == <object>self.callbacks[ind]:
                 if self.cnum == 1:
                     free(self.callbacks)
                 else:
@@ -51,44 +61,38 @@ cdef class Signal:
                     if not tmp: raise MemoryError()
                     self.callbacks = <void**>tmp
                 self.cnum -= 1
-        Py_DECREF(callback)
+        Py_DECREF(slot)
 
     def __call__(self, *args):
         self.emit(*args)
 
-    def emit(self, *args, **kwargs):
-        #------- sender?
-        # def _get_sender():
-        #     """Try to get the bound, class or module method calling the emit."""
-        #     import inspect
-        #     import sys
-        #
-        #     prev_frame = sys._getframe(2)
-        #     func_name = prev_frame.f_code.co_name
-        #
-        #     # Faster to try/catch than checking for 'self'
-        #     try:
-        #         return getattr(prev_frame.f_locals['self'], func_name)
-        #
-        #     except KeyError:
-        #         return getattr(inspect.getmodule(prev_frame), func_name)
-        #
-        # # Get the sender
-        # try:
-        #     _sender = _get_sender()
-        #
-        # # Account for when func_name is at '<module>'
-        # except AttributeError:
-        #     _sender = None
-        #
-        # # Handle unsupported module level methods for WeakMethod.
-        # # TODO: Support module level methods.
-        # except TypeError:
-        #     _sender = None
-        caller = kwargs.get('caller', None)
-        if self.name:
-            print(f'emit call, name: {self.name}, owner: {self.owner}, caller: {caller}, cbnum: {self.cnum}, value:{args[0]}')
+    def emit(self, *args):
         cdef int ind
         for ind in range(self.cnum):
             (<object>(self.callbacks[ind]))(*args)
+
+
+import weakref
+
+cdef class ClassSignal:
+    """
+    The class signal allows a signal to be set on a class rather than an instance.
+    This emulates the behavior of a PyQt signal
+    """
+    cdef readonly:
+        dict _map
+
+    def __cinit__(self):
+        self._map = {}
+
+    def __get__(self, instance, owner):
+        if instance is None:
+            # When we access ClassSignal element on the class object without any instance,
+            # we return the ClassSignal itself
+            return self
+        tmp = self._map.setdefault(self, weakref.WeakKeyDictionary())
+        return tmp.setdefault(instance, InstSignal())
+
+    def __set__(self, instance, value):
+        raise RuntimeError("Cannot assign to a Signal object")
 

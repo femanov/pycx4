@@ -18,13 +18,13 @@ cdef class Timer:
         int repeat
         int active
         sl_tid_t tid
-        Signal timeout
+        InstSignal timeout
 
     def __cinit__(self, int msec=1000):
         self.usec = msec * 1000
         self.repeat = 0
         self.active = 0
-        self.timeout = Signal(object)
+        self.timeout = InstSignal(object)
 
     cpdef void stop(self):
         """Stop any timer action."""

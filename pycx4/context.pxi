@@ -36,7 +36,7 @@ cdef class Context(CdaObject):
         self.check_exception(ret)
         self.cid, self.defpfx, self.chans, self.channum = ret, defpfx, NULL, 0
 
-        self.serverCycle = Signal(object)
+        self.serverCycle = InstSignal(object)
 
     def __dealloc__(self):
         if self.cid > 0:

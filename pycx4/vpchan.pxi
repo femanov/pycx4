@@ -80,8 +80,8 @@ cdef class VPChan(VChan):
 
     def __cinit__(self, str name, **kwargs):
         self.change_sign = kwargs.get('change_sign', False)
-        self.avgReady = Signal(object)
-        self.bgReady = Signal(object)
+        self.avgReady = InstSignal(object)
+        self.bgReady = InstSignal(object)
         self.bg_ready = False
         self.bg_count = -1
         self.n_avg = 1

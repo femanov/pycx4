@@ -30,7 +30,7 @@ cdef class FdEvent:
     def __cinit__(self, file, int mask=SL_RD):
         self.file = file
         self.mask = mask
-        self.ready = Signal(object)
+        self.ready = InstSignal(object)
         self.fhd = sl_add_fd(0, <void*>self, file.fileno(), mask, fd_event_proc, NULL)
 
     def __dealloc__(self):
