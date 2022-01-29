@@ -6,6 +6,8 @@ cdef class Signal:
     cdef:
         void **callbacks
         int cnum
+        str name
+        str owner
 
     def __cinit__(self, *args, **kwargs):
         self.name = kwargs.get('name', None)
