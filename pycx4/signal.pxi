@@ -7,7 +7,9 @@ cdef class Signal:
         void **callbacks
         int cnum
 
-    def __cinit__(self, *args):
+    def __cinit__(self, *args, **kwargs):
+        self.name = kwargs.get('name', None)
+        self.owner = kwargs.get('owner', None)
         self.callbacks = NULL
         self.cnum = 0
 
@@ -21,21 +23,17 @@ cdef class Signal:
         cdef:
             void *tmp
             int ind
-        if isinstance(slot, Signal):
-            callback = slot.emit
-        elif callable(slot):
-            callback = slot
-        else:
-            raise Exception('A function was expected')
+        if not callable(slot):
+            raise ValueError('callable was expected')
         for ind in range(self.cnum):
-            if callback == <object>self.callbacks[ind]:
+            if slot == <object>self.callbacks[ind]:
                 return
         tmp = realloc(<void*>self.callbacks, sizeof(void*) * (self.cnum+1))
         if not tmp: raise MemoryError()
         self.callbacks = <void**>tmp
-        self.callbacks[self.cnum] = <void*>callback
+        self.callbacks[self.cnum] = <void*>slot
         self.cnum += 1
-        Py_INCREF(callback)
+        Py_INCREF(slot)
 
     cpdef disconnect(self, callback):
         cdef:
@@ -53,9 +51,42 @@ cdef class Signal:
                 self.cnum -= 1
         Py_DECREF(callback)
 
+    def __call__(self, *args):
+        self.emit(*args)
+
     def emit(self, *args):
+        #------- sender?
+        # def _get_sender():
+        #     """Try to get the bound, class or module method calling the emit."""
+        #     import inspect
+        #     import sys
+        #
+        #     prev_frame = sys._getframe(2)
+        #     func_name = prev_frame.f_code.co_name
+        #
+        #     # Faster to try/catch than checking for 'self'
+        #     try:
+        #         return getattr(prev_frame.f_locals['self'], func_name)
+        #
+        #     except KeyError:
+        #         return getattr(inspect.getmodule(prev_frame), func_name)
+        #
+        # # Get the sender
+        # try:
+        #     _sender = _get_sender()
+        #
+        # # Account for when func_name is at '<module>'
+        # except AttributeError:
+        #     _sender = None
+        #
+        # # Handle unsupported module level methods for WeakMethod.
+        # # TODO: Support module level methods.
+        # except TypeError:
+        #     _sender = None
+
+        if self.name:
+            print(f'emit call, name: {self.name}, owner: {self.owner}, cbnum: {self.cnum}, value:{args[0]}')
         cdef int ind
-        print(f'emit call, sid: {id(self)}, cbnum: {self.cnum}')
         for ind in range(self.cnum):
             (<object>(self.callbacks[ind]))(*args)
 
