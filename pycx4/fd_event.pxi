@@ -2,7 +2,6 @@ from cx4.cxscheduler cimport sl_add_fd, sl_del_fd, sl_fdh_t, sl_set_fd_mask
 
 cdef void fd_event_proc(int uniq, void *privptr1, sl_fdh_t fdh, int fd, int mask, void *privptr2) with gil:
     cdef FdEvent fev = <FdEvent>privptr1
-    print("fd ready emit")
     fev.ready.emit(fev)
 
 
