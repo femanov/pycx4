@@ -56,7 +56,7 @@ cdef class Signal:
     def __call__(self, *args):
         self.emit(*args)
 
-    def emit(self, *args):
+    def emit(self, *args, **kwargs):
         #------- sender?
         # def _get_sender():
         #     """Try to get the bound, class or module method calling the emit."""
@@ -85,9 +85,9 @@ cdef class Signal:
         # # TODO: Support module level methods.
         # except TypeError:
         #     _sender = None
-
+        caller = kwargs.get('caller', None)
         if self.name:
-            print(f'emit call, name: {self.name}, owner: {self.owner}, cbnum: {self.cnum}, value:{args[0]}')
+            print(f'emit call, name: {self.name}, owner: {self.owner}, caller: {caller}, cbnum: {self.cnum}, value:{args[0]}')
         cdef int ind
         for ind in range(self.cnum):
             (<object>(self.callbacks[ind]))(*args)
