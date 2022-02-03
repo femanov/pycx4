@@ -6,6 +6,7 @@ cdef void sltimer_proc(int uniq, void *privptr1, sl_tid_t tid, void *privptr2) w
         t.tid = sl_enq_tout_after(0, NULL, t.usec, sltimer_proc, privptr2)
     else:
         t.active = 0
+        t.tid = 0
     t.timeout.emit()
 
 
@@ -43,11 +44,10 @@ cdef class Timer:
         self.tid = sl_enq_tout_after(0, NULL, self.usec, sltimer_proc, <void*>self)
 
     cpdef singleShot(self, int msec=0, proc=None):
-        if msec > 0:
-            self.setInterval(msec)
         if self.active == 1:
             sl_deq_tout(self.tid)
-            self.tid = sl_enq_tout_after(0, NULL, self.usec, sltimer_proc, <void*>self)
+        if msec > 0:
+            self.usec = 1000 * msec
         if proc is not None:
             self.timeout.connect(proc)
         self.active = 1
