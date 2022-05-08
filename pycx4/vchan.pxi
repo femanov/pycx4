@@ -23,7 +23,6 @@ cdef class VChan(BaseChan):
         if self.nelems != nelems:
             self.resize_val(nelems)
         c_len = self.get_data(0, self.itemsize * nelems, self.aval.data.as_voidptr)
-        #nelems_read = int(c_len/self.itemsize)
         self.valueMeasured.emit(self)
         self.valueChanged.emit(self)
 

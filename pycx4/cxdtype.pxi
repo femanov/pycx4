@@ -116,13 +116,13 @@ cdef:
     str cxdtype2pycode(cxdtype_t dtype):
         if dtype == CXDTYPE_DOUBLE: return 'd'
         elif dtype == CXDTYPE_SINGLE: return 'f'
-        elif dtype == CXDTYPE_INT32:  return 'l'
+        elif dtype == CXDTYPE_INT32:  return 'i'
         elif dtype == CXDTYPE_INT8:   return 'b'
         elif dtype == CXDTYPE_INT16:  return 'h'
         elif dtype == CXDTYPE_INT64:  return 'q'
         elif dtype == CXDTYPE_UINT8:  return 'B'
         elif dtype == CXDTYPE_UINT16: return 'H'
-        elif dtype == CXDTYPE_UINT32: return 'L'
+        elif dtype == CXDTYPE_UINT32: return 'I'
         elif dtype == CXDTYPE_UINT64: return 'Q'
         return None
 
