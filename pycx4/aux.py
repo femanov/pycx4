@@ -3,13 +3,13 @@ import pwd
 
 def cx_installpath():
     search_pathes = []
-    print(os.getenv('HOME'))
 
     if os.getenv('CXDIR'):
         search_pathes.append(os.getenv('CXDIR') + '/4cx/exports')
         search_pathes.append(os.getenv('CXDIR') + '/exports')
 
     search_pathes.append(os.getenv('HOME') + '/cx/4cx/exports')
+    search_pathes.append(os.getenv('HOME') + '/4pult')
 
     if os.getenv('USER') == "root":
         search_pathes.append(pwd.getpwnam(os.getenv('USER')).pw_dir + '/4pult')
