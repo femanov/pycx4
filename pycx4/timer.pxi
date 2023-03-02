@@ -13,6 +13,12 @@ cdef void sltimer_proc(int uniq, void *privptr1, sl_tid_t tid, void *privptr2) w
 cdef class Timer:
     """
     Timer class provides high-level to user in CX scheduler environment
+
+    Parameters:
+        msec - Interval in milliseconds
+
+
+
     """
     cdef readonly:
         int usec
@@ -63,4 +69,3 @@ cdef class Timer:
         if self.active == 1:
             sl_deq_tout(self.tid)
             self.tid = sl_enq_tout_after(0, NULL, self.usec, sltimer_proc, <void*>self)
-
