@@ -12,12 +12,17 @@ cdef void sltimer_proc(int uniq, void *privptr1, sl_tid_t tid, void *privptr2) w
 
 cdef class Timer:
     """
-    Timer class provides high-level to user in CX scheduler environment
+    Timer class provides high-level to user in CX scheduler environment.
+
+    Since cx scheduler C library has only timeout registration proc for
+    single function and single run. This class has Qt-like interface
+    in order to be able to run the same code with different schedulers.
 
     Parameters:
         msec - Interval in milliseconds
 
-
+    Signals:
+        timeout - emitted when timer interval out
 
     """
     cdef readonly:
