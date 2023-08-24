@@ -89,7 +89,7 @@ cdef class BaseChan(CdaObject):
         self.context = kwargs.get('context', default_context)
         self.max_nelems = kwargs.get('max_nelems', 1)
 
-        # that's bad... purent class know about subs, but works to force dtypes fro known cases
+        # that's bad... parent class know about subs, but works to force dtypes from known cases
         if isinstance(self, DChan) or isinstance(self, VPChan):
             self.dtype = CXDTYPE_DOUBLE
         elif isinstance(self, IChan):
@@ -115,22 +115,16 @@ cdef class BaseChan(CdaObject):
         # may be cycle?
         if kwargs.get('private', False):
             options += CDA_DATAREF_OPT_PRIVATE
-
         if kwargs.get('no_rd_conv', False):
             options += CDA_DATAREF_OPT_NO_RD_CONV
-
         if kwargs.get('shy', False):
             options += CDA_DATAREF_OPT_SHY
-
         if kwargs.get('find_only', False):
             options += CDA_DATAREF_OPT_FIND_ONLY
-
         if kwargs.get('on_update', False):
             options += CDA_DATAREF_OPT_ON_UPDATE
-
         if kwargs.get('no_wr_wait', False):
             options += CDA_DATAREF_OPT_NO_WR_WAIT
-
         if kwargs.get('debug', False):
             options += CDA_DATAREF_OPT_DEBUG
 
@@ -158,7 +152,6 @@ cdef class BaseChan(CdaObject):
         # CX event masks
         ## <-- have some implementation
         # TODO: need to allow user to select registered events
-
         ## CDA_REF_EVMASK_UPDATE
         # CDA_REF_EVMASK_STATCHG
         ## CDA_REF_EVMASK_STRSCHG
@@ -183,7 +176,7 @@ cdef class BaseChan(CdaObject):
             self.registered = 0
 
     def __str__(self):
-        return '<cda_chan: ref=%d, name=%s>' % (self.ref, self.name)
+        return f'<cda_chan: ref={self.ref}, name={self.name}>'
 
     def short_name(self):
         a = self.name.split('.')
@@ -216,7 +209,7 @@ cdef class BaseChan(CdaObject):
 
     cdef void check_exception(self, int c_res):
         if c_res < 0:
-            raise Exception("cda chan error: cname=%s, %s, errcode=%s" % (self.name, cda_last_err(), c_res ))
+            raise Exception(f"cda chan error: cname={self.name}, {cda_last_err()}, errcode={c_res}")
 
     cpdef is_available(self):
         if self.rslv_stat == CDA_RSLVSTAT_FOUND:
